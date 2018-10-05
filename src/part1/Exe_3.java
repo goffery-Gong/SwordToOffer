@@ -1,19 +1,17 @@
 package part1;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Stack;
 
-
 public class Exe_3 {
 	/**
-	 * Ê¹ÓÃÕ»
+	 * ä½¿ç”¨æ ˆ
 	 * @param listNode
 	 * @return
 	 */
 	public ArrayList<Integer> printListFromTailToHead(ListNode listNode) {
-		Stack stack = new Stack();
+		Stack<Integer> stack = new Stack<>();
 		ArrayList<Integer> list = new ArrayList<>();
 
 		while (listNode != null) {
@@ -22,22 +20,30 @@ public class Exe_3 {
 		}
 
 		while (!stack.isEmpty()) {
-			list.add((Integer) stack.pop());
+			list.add(stack.pop());
 		}
 		return list;
 	}
 	
 	/**
-	 * Ê¹ÓÃµİ¹éµ÷ÓÃ
+	 * ä½¿ç”¨é€’å½’è°ƒç”¨
 	 */
+	ArrayList<Integer> list = new ArrayList<>();
 	
+	public ArrayList<Integer> printListFromTailToHead2(ListNode listNode){
+		if(listNode!=null){
+			this.printListFromTailToHead2(listNode.next);
+			list.add(listNode.val);
+		}
+		return list;
+	}
 	
 	/**
-	 * Ê¹ÓÃCollections·´×ª·½·¨
+	 * ä½¿ç”¨Collectionsåè½¬æ–¹æ³•
 	 * @param listNode
 	 * @return
 	 */
-	public ArrayList<Integer> printListFromTailToHead2(ListNode listNode) {
+	public ArrayList<Integer> printListFromTailToHead3(ListNode listNode) {
         ArrayList<Integer> list = new ArrayList<Integer>(); 
          
         while(listNode != null){
@@ -45,7 +51,7 @@ public class Exe_3 {
             listNode = listNode.next;
         }
          
-        Collections.reverse(list);//Ê¹ÓÃCollectionsµÄreverse·½·¨£¬Ö±½Ó½«list·´×ª
+        Collections.reverse(list);//ä½¿ç”¨Collectionsçš„reverseæ–¹æ³•ï¼Œç›´æ¥å°†liståè½¬
         return list;
     }
 }

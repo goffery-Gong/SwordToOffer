@@ -3,8 +3,7 @@ package part1;
 
 public class Exe_1 {
 	/**
-	 * ·½·¨Ò»
-	 * 
+	 * æ–¹æ³•ä¸€
 	 * @param target
 	 * @param array
 	 * @return
@@ -34,8 +33,7 @@ public class Exe_1 {
 	}
 
 	/**
-	 * ·½·¨¶þ
-	 * 
+	 * æ–¹æ³•äºŒ
 	 * @param target
 	 * @param array
 	 * @return
