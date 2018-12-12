@@ -90,7 +90,7 @@
     }
 
 - 递归方法  
-n=4，看看程序怎么跑的：
+  n=4，看看程序怎么跑的：
 
 
     Fibonacci(4) = Fibonacci(3) + Fibonacci(2);
@@ -110,7 +110,7 @@ n=4，看看程序怎么跑的：
             return f;
         }
     }; 
-    
+
 ### 8 变态跳台阶
 因为n级台阶，第一步有n种跳法：跳1级、跳2级、到跳n级  
 跳1级，剩下n-1级，则剩下跳法是f(n-1)  
@@ -126,3 +126,123 @@ n=4，看看程序怎么跑的：
             else 
                 return 2*JumpFloorII(target-1);
     }
+
+### 9 单例模式
+
+- 关键点：自由序列化，线程安全，保证单例
+
+- [参考1](http://wuchong.me/blog/2014/08/28/how-to-correctly-write-singleton-pattern/ )
+
+- [参考2](https://my.oschina.net/lichhao/blog/107766 )
+
+- 饿汉式单例：
+  - 类加载时候静态变量初始化，实例创建（非懒加载）
+  - 线程不安全
+  - 构造函数私有，类不能被继承
+  - 饿汉式的创建方式在一些场景中将无法使用：譬如 Singleton 实例的创建是依赖参数或者配置文件的，在 getInstance() 之前必须调用某个方法设置参数给它，那样这种单例写法就无法使用了。
+
+```java
+public class EagerSingleton {
+    //通过静态变量初始化类实例
+    private static final EagerSingleton instance=new EagerSingleton();
+
+    private EagerSingleton(){}
+
+    //获取唯一实例的静态工厂方法
+    public static EagerSingleton getInstance(){
+        return instance;
+    }
+}
+```
+- 懒汉单例类（同步的）
+  - 实例第一次被引用时候创建，不随 类的加载而初始化创建(懒加载)
+  - 线程安全
+  - 占用内存（线程同步加锁消耗内存）
+
+```java
+public class LazySingleton {
+
+    /**
+     * 此时静态变量不能声明为final，因为需要在工厂方法中对它进行实例化
+     */
+    private static LazySingleton instance;
+
+    /**
+     * 私有构造子，确保无法在类外实例化该类
+     */
+    private LazySingleton() {
+    }
+
+    /**
+     * synchronized关键字解决多个线程的同步问题
+     */
+    public static synchronized LazySingleton getInstance() {
+        if (instance == null) {
+            instance = new LazySingleton();
+        }
+        return instance;
+    }
+
+}
+```
+
+- 双重检验锁
+  - `instance = new Singleton()`这句，并非是一个原子操作（详见参考1）
+
+```java
+//1.0版本，存在instance = new Singleton()非原子操作问题
+public static Singleton getSingleton() {
+    if (instance == null) {                         //Single Checked
+        synchronized (Singleton.class) {
+            if (instance == null) {                 //Double Checked
+                instance = new Singleton();
+            }
+        }
+    }
+    return instance ;
+}
+```
+
+```java
+//2.0版本 使用volatile避免指令排序优化
+public class Singleton {
+    private volatile static Singleton instance; //声明成 volatile
+    private Singleton (){}
+    public static Singleton getSingleton() {
+        if (instance == null) {                         
+            synchronized (Singleton.class) {
+                if (instance == null) {       
+                    instance = new Singleton();
+                }
+            }
+        }
+        return instance;
+    }
+}
+```
+
+
+
+- **静态内部类——延长初始化占位**(推荐)
+
+```java
+
+```
+
+- 单元素枚举类（推荐）
+
+  [参考1](https://www.jianshu.com/p/c836a7576118)
+
+  [参考2](https://www.cnblogs.com/cielosun/p/6596475.html )
+
+  ```java
+  enum SingletonDemo{
+      INSTANCE;
+      public void otherMethods(){
+          System.out.println("Something");
+      }
+  }
+  ```
+
+- 总结
+  - 一般情况下直接使用饿汉式就好了，如果明确要求要懒加载（lazy initialization）会倾向于使用静态内部类，如果涉及到**反序列化创建对象**时会试着使用枚举的方式来实现单例。
