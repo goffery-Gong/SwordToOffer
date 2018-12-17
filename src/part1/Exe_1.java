@@ -39,18 +39,23 @@ public class Exe_1 {
 	 * @return
 	 */
 	public boolean Find2(int target, int[][] array) {
-		int row = 0;
-		int col = array[0].length - 1;
+		boolean result=false;
 
-		while (row <= array.length - 1 && col >= 0) {
-			if (target > array[row][col])
-				row++;
-			else if (target < array[row][col])
-				col--;
-			else
-				return true;
+		if(array!=null){
+			int row = 0;
+			int col = array[0].length - 1;
+
+			while (row <= array.length - 1 && col >= 0) {
+				if (target > array[row][col])
+					row++;
+				else if (target < array[row][col])
+					col--;
+				else {
+					result = true;
+					break;
+				}
+			}
 		}
-		return false;
+		return result;
 	}
-
 }

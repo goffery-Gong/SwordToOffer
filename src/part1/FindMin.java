@@ -1,5 +1,7 @@
 package part1;
 
+import java.util.Arrays;
+
 public class FindMin {
     /**
      *
@@ -42,5 +44,12 @@ public class FindMin {
 		int[] a={3,4,5,1,2};
 //		System.out.println( new FindMin().FindmMinNum(a));
 //		System.out.println(new FindMin().Fibonacci(3));
+		char[] str=new char[10];
+		String string="0123456789";
+        for (int i=0;i<string.length();i++) {
+            str[i]=string.charAt(i);
+            System.out.println(str[i]);
+        }
+
 	}
 }

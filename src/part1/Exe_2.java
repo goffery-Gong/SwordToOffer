@@ -16,6 +16,6 @@ public class Exe_2 {
 
     public static void main(String[] args) {
     	StringBuffer str=new StringBuffer();
-    	
+        System.out.println("1".compareTo("100"));
 	}
 }
