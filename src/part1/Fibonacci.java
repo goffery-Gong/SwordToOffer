@@ -1,5 +1,7 @@
 package part1;
 
+import java.util.Arrays;
+
 public class Fibonacci {
 
 	/**
@@ -38,11 +40,18 @@ public class Fibonacci {
 			return fibonaciDiguiMethod(n-1)+fibonaciDiguiMethod(n-2);
 	}
 
+	/**
+	 * 最佳方案，采用两个公式
+	 * {f(n), f(n-1), f(n-1), f(n-2)} ={1, 1, 1,0}^(n-1)
+	 * @param n
+	 * @return
+	 */
 	public static int finbonaciBestMethod(int n){
 		if(n<0) return 0;
 		if(n==1 || n==2) return 1;
 		int[][] base={{1,1},{1,0}};
-		return matrixCaculate(base,n-1)[0][0];
+		int[][] res= matrixCaculate(base,n-1);
+		return res[0][0];
 	}
 
 	//计算矩阵的p次幂，返回结果矩阵
@@ -52,7 +61,7 @@ public class Fibonacci {
 		int[][] res=matrixCaculate(matrix,p>>1);//时间复杂度为O(logn)的计算p次幂的算法
 		res=mutiMatrix(res,res);
 		if((p & 1)==1)  //返回1表示奇数，0表示偶数。
-			mutiMatrix(res,matrix);
+			res=mutiMatrix(res,matrix);
 		return res;
 	}
 
@@ -70,7 +79,9 @@ public class Fibonacci {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(finbonaciBestMethod(4));
-		System.out.println(FibonacciCycleMethod(4));
+		System.out.println(finbonaciBestMethod(8));
+		System.out.println(FibonacciCycleMethod(8));
+		System.out.println(-12>>1);
+		System.out.println(-12>>>1);
 	}
 }
