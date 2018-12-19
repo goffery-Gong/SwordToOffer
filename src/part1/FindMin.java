@@ -8,10 +8,13 @@ public class FindMin {
      * @param a
      * @return
      */
-    public int FindmMinNum(int[] a){
+    public static int FindmMinNum(int[] a){
 		int i=0;
 		int j=a.length-1;
 		int mid=i;
+
+		if(a==null)
+			return -1;
 
 		while(a[i] >=a [j]){
 			if(j-i==1){
@@ -30,7 +33,7 @@ public class FindMin {
 		return a[mid];
 	}
 
-	private int MinInOrder(int[] a, int i, int j){
+	private static int MinInOrder(int[] a, int i, int j){
 		int result=a[i];
 		for(int k=i+1; k<=j; k++){
 			if(a[k]<result)
@@ -41,15 +44,13 @@ public class FindMin {
 
 
 	public static void main(String[] args) {
-		int[] a={3,4,5,1,2};
-//		System.out.println( new FindMin().FindmMinNum(a));
+		int[] a={1,2,3};
+		System.out.println(FindmMinNum(a));
 //		System.out.println(new FindMin().Fibonacci(3));
-		char[] str=new char[10];
-		String string="0123456789";
-        for (int i=0;i<string.length();i++) {
-            str[i]=string.charAt(i);
-            System.out.println(str[i]);
-        }
-
+//		char[] str=new char[10];
+//		String string="0123456789";
+//        for (int i=0;i<string.length();i++) {
+//            str[i]=string.charAt(i);
+//            System.out.println(str[i]);
 	}
 }
