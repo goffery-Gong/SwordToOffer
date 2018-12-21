@@ -550,10 +550,13 @@ class Solution {
 因为f(n-1)=f(n-2)+f(n-3)+...+f(1)+f(0)  
 所以f(n)=2*f(n-1)递推出，f(n)=2^(n-1)
 
-    public int JumpFloorII(int target) {
-            if(target<=0) return 0;
-            if(target==1) return 1;
-            else 
-                return 2*JumpFloorII(target-1);
-    }
+```java
+public int JumpFloorII(int target) {
+        if(target<=0) return 0;
+        if(target==1) return 1;
+        else 
+            return 2*JumpFloorII(target-1);
+}
+```
 
+11111
