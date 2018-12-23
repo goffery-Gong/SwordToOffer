@@ -2,13 +2,15 @@
 
 [TOC]
 
+## 设计模式
+
 ### 单例模式
 
 - 关键点：自由序列化，线程安全，保证单例
 - [参考1](http://wuchong.me/blog/2014/08/28/how-to-correctly-write-singleton-pattern/ )
 - [参考2](https://my.oschina.net/lichhao/blog/107766 )
 
-#### 饿汉式单例
+**饿汉式单例**
 
 - 类加载时候静态变量初始化，实例创建（非懒加载）
 - 线程不安全
@@ -29,7 +31,7 @@ public class EagerSingleton {
 }
 ```
 
-#### 懒汉单例类（同步的）
+ **懒汉单例类（同步的）**
 
 - 实例第一次被引用时候创建，不随 类的加载而初始化创建(懒加载)
 - 线程安全
@@ -62,7 +64,7 @@ public class LazySingleton {
 }
 ```
 
-#### 双重检验锁
+ **双重检验锁**
 
 - 改进上面的同步方法。
 
@@ -101,9 +103,7 @@ public class Singleton {
 }
 ```
 
-
-
-#### **静态内部类——延长初始化占位**(推荐)
+**静态内部类——延长初始化占位(推荐)**
 
 ```java
 public class Singleton {  
@@ -117,7 +117,7 @@ public class Singleton {
 }
 ```
 
-#### 单元素枚举类（推荐）
+**单元素枚举类（推荐）**
 
 [参考1](https://www.jianshu.com/p/c836a7576118)
 
@@ -135,7 +135,7 @@ enum SingletonDemo{
 - 总结
   - 一般情况下直接使用饿汉式就好了，如果明确要求要懒加载（lazy initialization）会倾向于使用静态内部类，如果涉及到**反序列化创建对象**时会试着使用枚举的方式来实现单例。
 
-
+## 数组
 
 ###  数组中重复数字
 
@@ -253,6 +253,148 @@ public class FindDoubleNum {
   - 功能要求（找出任意重复数字`findDoubleBinary`/找出所有重复数组`其余所有`）
   - 性能要求（时间优先/空间优先）
   - 数组要求：不改变数组：`hash`
+
+### 矩阵中路径（回溯法）
+
+
+
+### 机器人运动范围（回溯法）
+
+```java
+package part1;
+
+/**
+ * 矩阵中寻找字符串
+ */
+public class RobotTraceInMatrix {
+    /**
+     * @param bound k值
+     * @param rows  行
+     * @param cols  列
+     * @return
+     */
+    public static int countMoving(int bound, int rows, int cols) {
+        if (bound < 0 || rows <= 0 || cols <= 0) return 0;
+        boolean[] isVisited = new boolean[rows * cols];
+
+
+        int size = countNum(bound, rows, cols, 0, 0, isVisited);
+        return size;
+    }
+
+    /**
+     * 计算机器人走过的格子数量
+     * @return
+     */
+    private static int countNum(int bound, int rows, int cols, int i, int j, boolean[] isVisited) {
+        int count = 0;
+
+        if (count(bound, rows, cols, i, j, isVisited)) {
+            isVisited[i * cols + j] = true;
+            count = 1
+                    + countNum(bound, rows, cols, i - 1, j, isVisited)
+                    + countNum(bound, rows, cols, i + 1, j, isVisited)
+                    + countNum(bound, rows, cols, i, j - 1, isVisited)
+                    + countNum(bound, rows, cols, i, j + 1, isVisited);
+        }
+        return count;
+    }
+
+    /**
+     * 判断格子是否能够达到
+     * @return
+     */
+    private static boolean count(int bound, int rows, int cols, int i, int j, boolean[] isVisited) {
+        if (i < rows && i >= 0 && j < cols && j >= 0 && !isVisited[i * cols + j]
+                && getDigitSum(i)+getDigitSum(j)<=bound)
+            return true;
+        return false;
+    }
+
+    /**
+     * 求一个整数的各位数字之和
+     * @param num
+     * @return
+     */
+    private static int getDigitSum(int num) {
+        int sum=0;
+        while(num>0){
+            sum+=num%10;
+            num=num/10;
+        }
+        return sum;
+    }
+
+
+    public static void main(String[] args) {
+        System.out.println(countMoving(10, 2, 2));
+
+    }
+}
+```
+
+### 剪绳子（动态规划/贪心算法）
+
+```java
+public class MaxValueAfterCutting {
+    /**
+     * 动态规划
+     * 时间复杂度为 O(n^2)，另外，建立了辅助容器，空间复杂度为 O(n)；
+     * @param n
+     * @return
+     */
+    public static int maxValueAferCutting(int n){
+        //本身n=3和n=2的情况下，不切是最长的，但是要求必须m>1
+        if(n<2)
+            return 0;
+        if(n==2)
+            return 1;
+        if(n==3)
+            return 2;
+
+        int maxLength=0;
+        int[] tempLengths=new int[n+1];
+        tempLengths[0]=0;
+        tempLengths[1]=1;
+        tempLengths[2]=2;
+        tempLengths[3]=3;
+
+        for (int i = 4; i <= n; i++) {
+            for (int j = 1; j <= i/2; j++) {
+                int tempLength=tempLengths[j]*tempLengths[i-j];
+                if(maxLength<tempLength)
+                    maxLength=tempLength;
+                tempLengths[i]=maxLength;
+            }
+        }
+        return maxLength;
+    }
+
+    /**
+     * 贪心算法 O(1)
+     * @param n
+     * @return
+     */
+    public static int maxValueAferCutting2(int n){
+        if(n<2)
+            return 0;
+        if(n==2)
+            return 1;
+        if(n==3)
+            return 2;
+
+        int timesOf3=n/3;
+        if(n-timesOf3*3==1)
+            timesOf3-=1;
+        int timesOf2=(n-timesOf3*3)/2;
+
+        return (int) (pow(3,timesOf3)*pow(2,timesOf2));
+    }
+    public static void main(String[] args) {
+        System.out.println(maxValueAferCutting2(8));
+    }
+}
+```
 
 ## 链表
 
@@ -517,13 +659,69 @@ public int Fibonacci(int n) {
 ```
 
 - 递归方法  
-  n=4，看看程序怎么跑的：
+  n=4，看看程序怎么跑的： 
 
-
-    Fibonacci(4) = Fibonacci(3) + Fibonacci(2);
-                        = Fibonacci(2) + Fibonacci(1) + Fibonacci(1) + Fibonacci(0);
-                        = Fibonacci(1) + Fibonacci(0) + Fibonacci(1) + Fibonacci(1) + Fibonacci(0);
+```java
+Fibonacci(4) = Fibonacci(3) + Fibonacci(2);
+                    = Fibonacci(2) + Fibonacci(1) + Fibonacci(1) + Fibonacci(0);
+                    = Fibonacci(1) + Fibonacci(0) + Fibonacci(1) + Fibonacci(1) + Fibonacci(0);
+```
 由于我们的代码并没有记录Fibonacci(1)和Fibonacci(0)的结果，对于程序来说它每次递归都是未知的，因此光是n=4时f(1)就重复计算了3次之多。    
+
+- 最佳解法
+
+  运用了两个公式：
+
+  $\left[
+  \begin{matrix}
+  f(n)& f(n-1) \\
+  f(n-1) & f(n-2) 
+  \end{matrix}
+  \right]=\left[
+  \begin{matrix}
+  1& 1 \\
+  1 & 0 
+  \end{matrix}
+  \right]^{n-1}$所以求得左上角第一个就行
+
+  $ a^n=a^{n/2}*a^{n/2} $ 当n为偶数；
+
+  $ a^n=a^{\frac{n-1}2}*a^{\frac{n-1}2}*a $ 当n为奇数
+
+  ```java
+  public static int finbonaciBestMethod(int n){
+     if(n<0) return 0;
+     if(n==1 || n==2) return 1;
+     int[][] base={{1,1},{1,0}};
+     int[][] res= matrixCaculate(base,n-1);
+     return res[0][0];
+  }
+  
+  //计算矩阵的p次幂，返回结果矩阵
+  private static int[][] matrixCaculate(int[][] matrix, int p) {
+     if(p==0) return null;
+     if(p==1) return matrix;
+     int[][] res=matrixCaculate(matrix,p>>1);//时间复杂度为O(logn)的计算p次幂的算法
+     res=mutiMatrix(res,res);
+     if((p & 1)==1)  //返回1表示奇数，0表示偶数。
+        res=mutiMatrix(res,matrix);
+     return res;
+  }
+  
+  //计算两个矩阵相乘得到一个新矩阵
+  private static int[][] mutiMatrix(int[][] m1, int[][] m2) {
+     int [][] res=new int[m1.length][m2[0].length];
+     for(int i=0;i<m1.length;i++){     //i应为m1的行
+        for(int j=0;j<m2[0].length;j++){//j应为m2的列
+           for(int k=0;k<m2.length;k++){
+              res[i][j]+=m1[i][k]*m2[k][j];
+           }
+        }
+     }
+     return res;
+  }
+  ```
+
 - 动态规划
 
 
@@ -559,4 +757,131 @@ public int JumpFloorII(int target) {
 }
 ```
 
-11111
+
+
+## 位运算
+
+总结
+
+- n & (n-1) ：相当于将n的二进制表示中最右边的1置为0
+- (n & 1) ==1成立，则n为奇数
+
+### 表格行数转化（99页）
+
+```java
+public class Excel2003 {
+    /**
+     * 输入字符串，输出行数
+     * @param str
+     * @return
+     */
+    public static int FindCol(String str) {
+        int sum = 0;
+        int exp = 0;
+        char[] chars = str.toCharArray();
+        for (int i = str.length() - 1; i >= 0; i--) {
+            sum += (chars[i] - 'A' + 1) * Math.pow(26, exp);
+            exp++;
+        }
+        return sum;
+    }
+
+    /**
+     * 输入行数，输出代表的字符串
+     * @param num
+     * @return
+     */
+    public static String FindNum(int num){
+        int count=Count(num);
+        char[] result=new char[count];
+
+        for (int i = count-1; i >= 0; i--) {
+            int temp=num%26;
+            result[i]=(char)('A'+temp-1);
+            num/=26;
+        }
+        return new String(result); //将char[]转化为string
+    }
+
+    /**
+     * 统计结果的字符串长度
+     * @param num
+     * @return
+     */
+    private static int Count(int num) {
+        int count=0;
+        while(num!=0){
+            num/=26;
+            count++;
+        }
+        return count;
+    }
+}
+```
+
+### 有符号整数二进制表示中1的个数
+
+有一个 32 位有符号整型，给出一个函数可以统计这个整型二进制表示中 1 的位元个数。负数由补码表示。  
+
+比如 32 位有符号整型 5，二进制表示为 00000000000000000000000000000101，值为 1 的位元有 2 个。对于 
+
+-5，二进制表示为 11111111111111111111111111111011，值为 1 的位元有 31 个。
+
+- 参考 [统计 32 位有符号整型二进制表示中 1 的数目](https://zhuanlan.zhihu.com/p/32899882)
+
+```java
+public class NumberOf1 {
+    /**
+     * 当输入为负数，可能出现死循环（>>>可以避免）
+     * 通过右移num实现，循环次数等于二进制位数
+     *
+     * @param num
+     * @return
+     */
+    public static int numberOf1(int num) {
+        int sum = 0;
+        int flag = 1;
+
+        while (num != 0) {
+            //不能将if 的判断条件写成 bits % 2 == 1 来判断当前位是否为 1，因为负数取余为负
+            if ((num & 1) == 1) //按位与：num & 1表示num的最后一位与1进行位运算
+                sum++;
+            num >>>= 1; //这里使用>>>可以避免陷入死循环，如果是>>就不行。
+        }
+        return sum;
+    }
+
+    /**
+     * 通过左移flag(1)实现
+     * 循环次数等于二进制位数
+     * @param num
+     * @return
+     */
+    public static int numberOfOne2(int num) {
+        int sum = 0;
+        int flag = 1;
+
+        while (flag != 0) {
+            //按位与;-5的补码为11111111111111111111111111111101，和flag进行&运算
+            if ((num & flag) == flag)
+                sum++;
+            flag = flag << 1;
+        }
+        return sum;
+    }
+
+    /**
+     * 一个整数-1，然后与原整数进行&操作，会把最右边的1变为0.
+     * @param args
+     */
+    public static int numberOfOne3(int num) {
+        //num &(num-1)
+        int count = 0;
+        while (num != 0) {
+            count++;
+            num = num & (num - 1);
+        }
+        return count;
+    }
+}
+```
