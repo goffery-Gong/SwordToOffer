@@ -2,6 +2,11 @@
 
 [TOC]
 
+## 算法题需要注意的
+
+- 代码完整性：功能测试（特殊值——突破思维限制）；边界测试（循环、递归的终止条件）；负面测试（错误的输入）
+- 特殊值：数值的负数/0；null；
+
 ## 设计模式
 
 ### 单例模式
@@ -134,6 +139,64 @@ enum SingletonDemo{
 
 - 总结
   - 一般情况下直接使用饿汉式就好了，如果明确要求要懒加载（lazy initialization）会倾向于使用静态内部类，如果涉及到**反序列化创建对象**时会试着使用枚举的方式来实现单例。
+
+## 数字
+
+### 数值的整数次方
+
+- 考虑极限情况：底数为0且指数小于0
+- 三种错误处理的方法：1. 函数返回值；2. 错误发生时设置一个全局变量；3. 抛异常
+- 使用公式/位运算提高效率
+
+```java
+package part1;
+/**
+ * @Auther: gongzhiwei6
+ * @Date: 2018/12/24 13:57
+ * @Description:
+ */
+public class Power {
+    boolean invaliInput=false;
+
+    /**
+     * 时间O(logn)
+     * @param base
+     * @param exp
+     * @return
+     */
+     double power(double base, int exp){
+        //考虑底数为0且指数小于0情况，用invalidInput变量来标记错误输入
+        if(base==0 && exp<0) {
+            invaliInput=true;
+            return 0.0;
+        }
+
+        int absExp=exp;
+        if(exp<0)
+            absExp=-exp;
+
+        double result=powerWithUnsignedExp(base, absExp);
+        if(exp<0)
+            result=1.0/result;
+        return result;
+    }
+
+    private double powerWithUnsignedExp(double base, int exp){
+        if(exp==0) return 1;
+        if(exp==1) return base;
+
+        double result=powerWithUnsignedExp(base, exp>>>1);
+        result*=result;
+        if((exp & 1)==1)
+            result*=base;
+        return result;
+    }
+    
+    public static void main(String[] args) {
+        System.out.println(new Power().power(-2,-3));
+    }
+}
+```
 
 ## 数组
 
