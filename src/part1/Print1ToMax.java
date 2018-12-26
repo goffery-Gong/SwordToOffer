@@ -68,5 +68,4 @@ public class Print1ToMax {
     public static void main(String[] args) {
         new Print1ToMax().printToMax(2);
     }
-
 }
