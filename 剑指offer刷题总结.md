@@ -461,6 +461,12 @@ public class MaxValueAfterCutting {
 
 ## 链表
 
+### 链表操作的特殊位置
+
+- 链表长度为1的CRUD
+- 删除/增加位置为第一个或最后一个
+- 
+
 ### 反向输出链表
 
 ```java
