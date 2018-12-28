@@ -2,9 +2,9 @@ package part1;
 
 import java.util.Iterator;
 
-public class LinkedList<E> implements Iterable {
+public class MyLinkedList<E> implements Iterable {
 
-    private static class Node<E> {
+    class Node<E> {
         E value;
         Node<E> next;
     }
@@ -160,18 +160,13 @@ public class LinkedList<E> implements Iterable {
 //        Node<Integer> newNode=new Node<>();
 //        Node<Integer> first=newNode;
 //        System.out.println(first==newNode);
-        LinkedList<Integer> list = new LinkedList<>();
+        MyLinkedList<Integer> list = new MyLinkedList<>();
         list.addFirst(3);
         list.addFirst(2);
         list.addFirst(1);
         list.addLast(4);
         for (Object i : list) {
             System.out.print(i + " ");
-        }
-        try {
-            list.removeCopyWay(1);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 //        try {
 //            System.out.println("µÚ2¸öÎª£º"+list.get(2));
