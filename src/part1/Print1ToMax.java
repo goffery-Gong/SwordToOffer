@@ -131,5 +131,4 @@ public class Print1ToMax {
         new Print1ToMax().printNumbers(2);
 //        new Print1ToMax().printToMax(2);
     }
-
 }
