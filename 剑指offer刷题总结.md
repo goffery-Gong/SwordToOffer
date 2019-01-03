@@ -459,6 +459,126 @@ public class MaxValueAfterCutting {
 }
 ```
 
+### 面试题21-调整数组顺序使奇数位于偶数前面
+
+```java
+package part1;
+
+public class OrderArray {
+    /**
+     * 常规方法，交换
+     * @param array
+     */
+    public void orderArray(int[] array) {
+        if(array==null || array.length==0)
+            return;
+
+        int lo = 0;
+        int hi = array.length-1;
+        while (true){
+            while(lo<hi && (array[lo] & 1)!=0) //找到第一个偶数
+                lo++;
+            while (lo<hi && (array[hi] & 1)!=1)//找到第一个奇数
+                hi--;
+            if(lo>=hi) break;
+            exch(array,lo,hi);
+        }
+    }
+
+    /**
+     * 函数解耦，提高复用,将条件抽取出来单独作为一个函数进行判断
+     * @param array
+     */
+    public void orderArrayBest(int[] array) {
+        if(array==null || array.length==0)
+            return;
+
+        int lo = 0;
+        int hi = array.length-1;
+        while (true){
+            while(lo<hi && !isEvent(array[lo]))
+                lo++;
+            while (lo<hi && isEvent(array[hi]))
+                hi--;
+            if(lo>=hi) break;
+            exch(array,lo,hi);
+        }
+    }
+
+    private boolean isEvent(int i) {
+        return (i & 1)==0;
+    }
+
+    private void exch(int[] array, int lo, int hi) {
+        int temp=array[lo];
+        array[lo]=array[hi];
+        array[hi]=temp;
+    }
+
+    public static void main(String[] args) {
+        int[] a={2,2,3,5,6,7};
+        new OrderArray().orderArrayBest(a);
+        for (int i :
+                a) {
+            System.out.print(i+" ");
+        }
+    }
+}
+```
+
+## 字符串
+
+### 面试题20-表示数值的字符串
+
+```java
+package part1;
+
+public class IsNumeric {
+    private int i;
+    private int inx;
+
+    public boolean isNumric(String num){
+        if(num==null)
+            return false;
+        //判断整数部分
+        boolean flag=scanInteger(num);
+
+        //判断小数部分
+        if(i<num.length() && (num.charAt(i)=='.')){
+            i++;
+            flag=flag | isUnsignedInteger(num); //注意运算符短路
+        }
+        //判断指数部分
+        if(i<num.length() && (num.charAt(i)=='e' || num.charAt(i)=='E')){
+            i++;
+            flag=flag & scanInteger(num);
+        }
+
+        return flag && i>=num.length();
+    }
+
+    //判断 指数位/整数位为可带符号整数
+    private boolean scanInteger(String num) {
+        if(i<num.length() && (num.charAt(i)=='+' || num.charAt(i)=='-'))
+            i++;
+        return isUnsignedInteger(num);
+    }
+
+    //判断 小数位为无符号整数
+    private boolean isUnsignedInteger(String num) {
+        int before=i;
+        while(i<num.length() && num.charAt(i)>='0' && num.charAt(i)<='9')
+            i++;
+        return i>before;
+    }
+
+
+    public static void main(String[] args) {
+        System.out.println(new IsNumeric().isNumric("3.-12"));
+    }
+}
+```
+
 ## 链表
 
 ### 链表操作的特殊位置
@@ -954,3 +1074,85 @@ public class NumberOf1 {
     }
 }
 ```
+
+
+
+## 其他
+
+### 面试题19-正则表达式匹配（递归）
+
+- 递归的使用
+- 注意特殊情况：`str`用完的情况
+
+```java
+package part1;
+
+public class MatchModel {
+
+    public boolean match(String str, String model) {
+        boolean flag = true;
+        if (str == null || model == null) {
+            return false;
+        }
+        return matchModel(str, 0, model, 0);
+    }
+
+    /**
+     * 匹配:'*'——前面字符出现任意次数；'.'——任意字符
+     * 如果模式匹配字符的下一个字符是‘*’:
+        * 如果pttern当前字符和str的当前字符匹配，：有以下三种可能情况
+             * （1）pttern当前字符能匹配 str 中的 0 个字符：match(str, pattern+2)
+             * （2）pttern当前字符能匹配 str 中的 1 个字符：match(str+1, pattern+2)
+             * （3）pttern当前字符能匹配 str 中的 多 个字符：match(str+1, pattern)
+        * 如果pttern当前字符和和str的当前字符不匹配
+            * pttern当前字符能匹配 str 中的 0 个字符：(str, pattern+2)
+     * 如果模式匹配字符的下一个字符不是‘*’，进行逐字符匹配。
+        * 对于 ‘.’ 的情况比较简单，’.’ 和一个字符匹配 match(str+1, pattern+1)
+     *
+     * 另外需要注意的是：空字符串"" 和 ".*" 是匹配的
+     *
+     * @param str
+     * @param model
+     * @return
+     */
+    public boolean matchModel(String str, int i, String model, int j) {
+
+        if (i >= str.length() && j >= model.length()) //都结束
+            return true;
+        if (i < str.length() && j >= model.length()) //str没结束，model结束了
+            return false;
+
+        //下一位是'*'
+        if (j + 1 < model.length() && model.charAt(j + 1) == '*') {
+            //字符串完了
+            if (i >= str.length())
+                return matchModel(str, i, model, j + 2);
+
+             //当前位相同，则有三种情况是匹配的
+            if (str.charAt(i) == model.charAt(j) || model.charAt(j) == '.') {
+                return matchModel(str, i, model, j + 2)
+                        || matchModel(str, i + 1, model, j + 2)
+                        || matchModel(str, i + 1, model, j);
+            } else //当前位不相同
+                return matchModel(str, i, model, j + 2);
+        }
+        //下一位不是"*"
+        else if(i>=str.length())
+            return false;
+        else if (str.charAt(i) == model.charAt(j) || model.charAt(j) == '.')
+            return matchModel(str, i + 1, model, j + 1);
+        return false;
+    }
+
+    public static void main(String[] args) {
+        boolean flag = new MatchModel().match("", ".*");
+        System.out.println(flag);
+
+        char[] chars = "aa".toCharArray();
+//        System.out.println(new MatchModel().matchCore(chars, 0, "a*a".toCharArray(), 0));
+    }
+}
+```
+
+
+
