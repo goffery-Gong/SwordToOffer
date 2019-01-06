@@ -526,6 +526,61 @@ public class OrderArray {
 }
 ```
 
+### 面试题29-顺时针打印矩阵
+
+- 一圈一圈的打印
+
+```java
+package part1.Singleton;
+
+public class PrintMatrix {
+    public void printMatrix(int[][] matrix) {
+        if (matrix == null)
+            return;
+
+        int start = 0;
+        int rows = matrix.length;
+        int cols = matrix[0].length;
+
+        while (start * 2 < cols && start * 2 < rows) {//循环结束条件
+            printMatrixInCircle(matrix, rows, cols, start);
+            start++;
+        }
+    }
+
+    private void printMatrixInCircle(int[][] matrix, int rows, int cols, int start) {
+        int endX = cols - 1 - start;
+        int endY = rows - 1 - start;
+
+        //从左向右打印
+        for (int i = start; i <= endX; i++)
+            System.out.println(matrix[start][i]);
+        
+        //从上到下打印,至少两行
+        if (start < endY)
+            for (int i = start + 1; i <= endY; i++)
+                System.out.println(matrix[i][endX]);
+            
+        //从右到左打印，至少两行两列
+        if (start < endY && start < endX)
+            for (int i = endX - 1; i >= start; i--)
+                System.out.println(matrix[endY][i]);
+            
+        //从下到上答应，至少三行两列
+        if (endY - start > 1 && start < endX)
+            for (int i = endY - 1; i > start; i--)
+                System.out.println(matrix[i][start]);
+    }
+
+    public static void main(String[] args) {
+        int[][] matrix = {{1, 2, 3, 4, 5}, {5, 6, 7, 8, 9}, {9, 10, 11, 12, 13}, {13, 14, 15, 16, 17}};
+        new PrintMatrix().printMatrix(matrix);
+    }
+}
+```
+
+
+
 ## 字符串
 
 ### 面试题20-表示数值的字符串
@@ -579,7 +634,7 @@ public class IsNumeric {
 }
 ```
 
-## 链表
+## 链表与树
 
 - 链表长度为1的CRUD
 - 删除/增加位置为第一个或最后一个
@@ -835,7 +890,7 @@ public class CircleList {
 }
 ```
 
-### 面试题24-合并有序链表
+### 面试题25-合并有序链表
 
 ```java
 package part1;
@@ -868,6 +923,120 @@ public class MergeList {
             mergeHead.next=merge(head1, head2.next);
         }
         return mergeHead;
+    }
+}
+```
+
+
+
+### 面试题26-树的子结构
+
+- 特别注意每次指针的指向是否为null
+- 测试用例：
+  - 树A/B中至少有一个为null
+  - 树A/B中所有节点都只有左节点或者右子节点
+  - 树A/B节点中含有分叉
+
+```java
+package part1;
+
+public class HasSubTree {
+    class BinaryTreeNode{
+        double value; //注意是double类型
+        BinaryTreeNode left;
+        BinaryTreeNode right;
+    }
+
+    public boolean hasSubTree(BinaryTreeNode root1, BinaryTreeNode root2){
+        boolean result=false;
+
+        //递归遍历树1，找到与树2根节点相同的节点。
+        if(root1!=null && root2!=null){
+            //找到了入口，进行下一步判断
+            if(equal(root1.value,root2.value))
+                result=doTree1HasTree2(root1, root2);
+            if(!result)
+                result=hasSubTree(root1.left, root2);
+            if(!result)
+                result=hasSubTree(root1.right,root2);
+        }
+        return result;
+    }
+
+    private boolean doTree1HasTree2(BinaryTreeNode root1, BinaryTreeNode root2) {
+        if(root2==null)
+            return true;
+        if(root1==null)
+            return false;
+
+        if(!equal(root1.value,root2.value))
+            return false;
+
+        return doTree1HasTree2(root1.left, root2.left)
+                && doTree1HasTree2(root1.right,root2.right);
+    }
+
+    //double 类型的数值比较不能直接用==
+    private boolean equal(double value, double value1) {
+        if((value-value1>-0.000001) && (value-value1<0.000001))
+            return true;
+        else
+            return false;
+    }
+}
+```
+
+### 面试题27- 二叉树镜像
+
+```java
+public class MirrorTree {
+
+    public void mirrorTree(BinaryTreeNode treeNode){
+        if(treeNode!=null)
+            return;
+
+        //叶节点就返回
+        if(treeNode.left==null && treeNode.right==null)
+            return;
+
+        //交换左右节点
+        BinaryTreeNode temp=treeNode.left;
+        treeNode.left=treeNode.right;
+        treeNode.right=temp;
+
+        //分析左节点/右节点之下
+        if(treeNode.left!=null)
+            mirrorTree(treeNode.left);
+        if(treeNode.right!=null)
+            mirrorTree(treeNode.right);
+    }
+}
+```
+
+### 面试题28-对称二叉树
+
+```java
+package part1;
+
+public class isSymmetrical {
+    public boolean isSymmetrical(BinaryTreeNode root){
+        return isSymmetrical(root ,root);
+    }
+
+    private boolean isSymmetrical(BinaryTreeNode root1, BinaryTreeNode root2) {
+        //递归终止条件
+        if(root1 == null && root2==null)
+            return true;
+        if(root1==null || root2==null)
+            return false;
+
+        //根节点不相等就返回false
+        if(root1.value!=root2.value)
+            return false;
+
+        //根节点相同再判断左右节点(前序遍历，对称前序遍历)
+        return isSymmetrical(root1.left,root2.right)
+                && isSymmetrical(root1.right,root2.left);
     }
 }
 ```
