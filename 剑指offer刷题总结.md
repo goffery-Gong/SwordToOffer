@@ -1319,7 +1319,117 @@ public int JumpFloorII(int target) {
 }
 ```
 
+### 面试题30-包含min函数的栈
 
+```java
+package part1;
+
+import java.util.Stack;
+
+public class MinInStack {
+    Stack<Integer> dataStack=new Stack<>();
+    Stack<Integer> minStack=new Stack<>();
+
+    public void push(int node) {
+        dataStack.push(node);
+        if(minStack.empty() || node<minStack.peek())
+            minStack.push(node);
+        else
+            minStack.push(minStack.peek());
+    }
+
+    public void pop() {
+        if(!dataStack.empty() && minStack.size()>0){
+            dataStack.pop();
+            minStack.pop();
+        }
+    }
+
+    public int min() {
+        if(!dataStack.empty() && minStack.size()>0)
+            return minStack.peek();
+        else return -1;
+    }
+}
+```
+
+
+
+### 面试题31-栈的压入弹出序列
+
+```java
+package part1;
+
+import java.util.Stack;
+
+public class IsPopOrder {
+    /**
+     * 书上方法
+     * @param pushA
+     * @param popA
+     * @return
+     */
+    public boolean isPopOrder(int[] pushA, int[] popA) {
+        if (pushA == null || popA == null)
+            return false;
+
+        boolean isPos = false;
+        int j = 0;
+        int i;
+        Stack<Integer> stack = new Stack<>();
+
+        for (i = 0; i < popA.length; i++) {
+            //栈顶元素与popA序列不同，则执行入栈;直到相同
+            while (stack.empty() || stack.peek() != popA[i]) {
+                if (j >= pushA.length)
+                    break;
+                stack.push(pushA[j]);
+                j++;
+            }
+            //如果pushA都入栈完毕，栈顶都不同，跳出循环
+            if (stack.peek() != popA[i])
+                break;
+
+            stack.pop();
+        }
+
+        if(i==popA.length && stack.empty())
+            isPos=true;
+
+        return isPos;
+    }
+
+    /**
+     * 论坛方法，better
+     * @param pushA
+     * @param popA
+     * @return
+     */
+    public boolean isPopOrder2(int[] pushA, int[] popA){
+        if (pushA == null || popA == null)
+            return false;
+
+        //标识popA的位置
+        int j = 0;
+        Stack<Integer> stack = new Stack<>();
+
+        for (int i = 0; i < pushA.length; i++) {
+            stack.push(pushA[i]);
+
+            ////如果栈不为空，且栈顶元素等于弹出序列
+            while (!stack.empty() && stack.peek() == popA[j]) {
+                stack.pop();
+                j++;
+            }
+        }
+        return stack.empty();
+    }
+
+    public static void main(String[] args) {
+
+    }
+}
+```
 
 ## 位运算
 
