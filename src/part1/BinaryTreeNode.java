@@ -21,4 +21,18 @@ public class BinaryTreeNode {
         System.out.println(root.value);
         inOrderRec(root.right);
     }
+
+    /**
+     * 在节点下添加新子树
+     * @param leftVal
+     * @param rigthVal
+     */
+    void add(int leftVal, int rigthVal){
+        BinaryTreeNode node=new BinaryTreeNode();
+        BinaryTreeNode node2=new BinaryTreeNode();
+        node.value=leftVal;
+        node2.value=rigthVal;
+        left=node;
+        right=node2;
+    }
 }
