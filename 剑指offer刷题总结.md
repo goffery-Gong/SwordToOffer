@@ -200,6 +200,8 @@ public class Power {
 
 ## 数组
 
+- 数组注意输入：判断null与数组长度为0，a.length==0
+
 ###  数组中重复数字
 
 ```java
@@ -1266,6 +1268,197 @@ public class PrintBinaryTree {
 }
 
 ```
+
+### 面试题33-二叉搜索树的后序遍历序列
+
+```java
+package part1;
+
+import java.util.Arrays;
+
+/**
+ * @Auther: PC
+ * @Date: 2019/1/10 22:09
+ * @Description:
+ */
+public class ISBST {
+    /**
+     * 判断是否为bst的后序遍历序列
+     *
+     * @param sequence
+     * @return
+     */
+    boolean VerifySquenceOfBST(int[] sequence) {
+        if (sequence == null || sequence.length==0)
+            return false;
+
+        int root = sequence[sequence.length - 1];
+        //查找左子树中小于根节点的值
+        int i;
+        for (i = 0; i < sequence.length - 1; i++)
+            if (sequence[i] > root)
+                break;
+
+        //查找右子树中大于根节点的值
+        int j = i;
+        for (; j < sequence.length - 1; j++)
+            if (sequence[j] < root)
+                return false;
+
+        boolean left = true;
+        boolean right = true;
+        if (i > 0)
+            left = VerifySquenceOfBST(Arrays.copyOfRange(sequence, 0, i));//包含起点，不包含终点
+        if (j < sequence.length - 1)
+            right = VerifySquenceOfBST(Arrays.copyOfRange(sequence, i + 1, sequence.length - 1));
+
+        return left && right;
+    }
+
+    public static void main(String[] args) {
+        int a[] = {2, 3, 4, 5, 6, 7, 8, 9};
+        int from = 0;
+        int to = 8;
+        int original[] = Arrays.copyOfRange(a, from, to);
+        for (int c : original) {
+            System.err.println(c);
+        }
+    }
+}
+```
+
+### 面试题34- 二叉树中和为某一值的路径
+
+```java
+package part1;
+
+import java.util.Stack;
+
+/**
+ * @Auther: PC
+ * @Date: 2019/1/11 09:49
+ * @Description:
+ */
+public class FindPath {
+    public void findPath(BinaryTreeNode root, int num) {
+        if (root == null)
+            return;
+
+        Stack<Integer> stack = new Stack<>();
+        int curSum = 0;
+        //前序遍历根节点，通过栈保存节点；如果节点和为num，则输出
+        findPath(root, num, stack, curSum);
+    }
+
+    private void findPath(BinaryTreeNode root, int num, Stack<Integer> stack, int curSum) {
+        boolean isLeaf = root.left == null && root.right == null;
+        stack.push(root.value);
+        curSum += root.value;
+
+        //当访问到叶节点，并且num符合
+        if (isLeaf && curSum == num)
+            for (Integer i : stack)
+                System.out.println(i);
+
+        if (root.left != null)
+            findPath(root.left, num, stack, curSum);
+        if (root.right != null)
+            findPath(root.right, num, stack, curSum);
+
+        //再返回父节点前，在路径上删除当前节点
+        //两种情况会访问到这：叶节点；某节点的子路径都访问完了，没有符合条件的路径，要返回上一层节点
+        stack.pop();
+    }
+
+    public static void main(String[] args) {
+        BinaryTreeNode node = new BinaryTreeNode();
+        node.value = 1;
+        node.add(2, 3);
+        node.left.add(4, 5);
+        node.right.add(6, 7);
+
+        new FindPath().findPath(node, 10);
+    }
+}
+```
+
+
+
+### 面试题35- 复杂链表的复制
+
+```java
+package part1;
+
+/**
+ * @Auther: Goffery Gong
+ * @Date: 2019/1/11 11:12
+ * @Description:
+ */
+public class CloneLinkedList {
+    RandomListNode clone(RandomListNode pHead) {
+        cloneNodes(pHead);
+        setRandomNode(pHead);
+        return cutList(pHead);
+    }
+
+    //第一步，将节点复制到原节点之后
+    private void cloneNodes(RandomListNode phead) {
+        RandomListNode cur = phead;
+        while (cur != null) {
+            RandomListNode temp = new RandomListNode();
+            temp.label = cur.label;
+            temp.next = cur.next;
+            temp.random = null;
+
+            cur.next = temp;
+            cur = temp.next;
+        }
+    }
+
+    //第二步，设定clone出的节点的random指向
+    private void setRandomNode(RandomListNode phead) {
+        RandomListNode cur = phead;
+        while (cur != null) {
+            RandomListNode temp = cur.next;
+            if (cur.random != null)
+                temp.random = cur.random.next;
+            cur = temp.next;
+        }
+    }
+
+    //第三步，将长链表拆成两个子链表，偶数位形成的链表为clone链表
+    private RandomListNode cutList(RandomListNode phead) {
+        RandomListNode listNode = phead;
+        RandomListNode cloneNode=null;
+        RandomListNode newHead=null;
+
+        //给cloneNode赋第一个值，并将listNode向后移动
+        if (listNode != null) {
+            cloneNode = listNode.next; //cloneNode的第一个节点为长链的第二个节点
+            newHead = cloneNode;
+            listNode.next = cloneNode.next;//listNode的下一个指向cloneNode的下一个节点
+            listNode = listNode.next;     //将listNode指向新的位置
+        }
+
+        //开始循环
+        while (listNode != null) {
+            cloneNode.next = listNode.next;
+            cloneNode = cloneNode.next;
+            listNode.next = cloneNode.next;
+            listNode = listNode.next;
+        }
+        return newHead;
+    }
+
+    private class RandomListNode {
+        int label;
+        RandomListNode next;
+        RandomListNode random;
+    }
+}
+```
+
+
 
 ## 栈和队列
 

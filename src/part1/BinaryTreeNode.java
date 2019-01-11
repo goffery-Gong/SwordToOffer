@@ -22,6 +22,14 @@ public class BinaryTreeNode {
         inOrderRec(root.right);
     }
 
+    public void backOrderRec(BinaryTreeNode root){
+        if(root==null)
+            return;
+
+        backOrderRec(root.left);
+        backOrderRec(root.right);
+        System.out.println(root.value);
+    }
     /**
      * 在节点下添加新子树
      * @param leftVal
