@@ -636,6 +636,163 @@ public class IsNumeric {
 }
 ```
 
+### 面试题38-字符串的排列
+
+```java
+package part1;
+
+import java.util.*;
+
+/**
+ * @Auther: Goffery Gong
+ * @Date: 2019/1/16 10:56
+ * @Description:
+ */
+public class SortString {
+    List<String> list = new ArrayList<>();
+
+    /**
+     * 递归思路
+     *
+     * @param str
+     * @return
+     */
+    List<String> sortString(String str) {
+        if (str == null || str.length() == 0)
+            return list;
+        sortString(str, 0);
+        Collections.sort(list);
+        return list;
+    }
+
+    private void sortString(String str, int i) {
+        if (i >= str.length())
+            return;
+
+        for (int j = i; j < str.length(); j++) {
+            if (!list.contains(str))
+                list.add(str);
+
+            //交换，构造新的串
+            String newStr = exchAndBuild(str, i, j);
+
+            //新的串进行递归
+            sortString(newStr, i + 1);
+        }
+    }
+
+    private String exchAndBuild(String str, int i, int j) {
+        char[] chars = str.toCharArray();
+        char t = chars[i];
+        chars[i] = chars[j];
+        chars[j] = t;
+        return new String(chars);
+    }
+   /**
+     * 回溯法
+     * @param str
+     * @return
+     */
+    public ArrayList<String> Permutation(String str) {
+        List<String> resultList = new ArrayList<>();
+        if (str.length() == 0)
+            return (ArrayList) resultList;
+        //递归的初始值为（str数组，空的list，初始下标0）
+        fun(str.toCharArray(), resultList, 0);
+        Collections.sort(resultList);
+        return (ArrayList) resultList;
+    }
+
+    private void fun(char[] ch, List<String> list, int i) {
+        //这是递归的终止条件，就是i下标已经移到char数组的末尾的时候，考虑添加这一组字符串进入结果集中
+        if (i == ch.length - 1) {
+            //判断一下是否重复
+            if (!list.contains(new String(ch))) {
+                list.add(new String(ch));
+                return;
+            }
+        } else {
+            for (int j = i; j < ch.length; j++) {
+                swap(ch, i, j);
+                fun(ch, list, i + 1);
+                swap(ch, i, j);
+            }
+        }
+    }
+
+    //交换数组的两个下标的元素
+    private void swap(char[] str, int i, int j) {
+        if (i != j) {
+            char t = str[i];
+            str[i] = str[j];
+            str[j] = t;
+        }
+    }
+    public static void main(String[] args) {
+        System.out.println(new SortString().sortString("abc"));
+//        System.out.println(new SortString().Permutation("abc"));
+    }
+}
+```
+
+### 面试题38-拓展 
+
+```java
+package part1;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+/**
+ * @Auther: Goffery Gong
+ * @Date: 2019/1/16 16:32
+ * @Description:
+ */
+public class CharConbine {
+    private Set<String> resultSet;
+    private int index;
+    private StringBuilder sb=new StringBuilder();
+
+    List<String> combine(char[] chars) {
+        if (chars == null || chars.length == 0)
+            return new ArrayList<>();
+
+        resultSet = new TreeSet<>();
+        for (int i = 1; i <= chars.length; i++)
+            combine(chars, i);
+
+        return new ArrayList<>(resultSet);
+    }
+
+    private void combine(char[] chars, int length) {
+         if (length == 0) {
+            resultSet.add(sb.toString());
+            return;
+        }
+        if(chars.length-index<length)
+            return;
+
+        //选择第一个，从剩下chars中选择length-1个
+        sb.append(chars[index]);
+        index++;
+        combine(chars,length-1);
+        sb.deleteCharAt(sb.length()-1);
+
+        //不选择第一个，从剩下chars中length个
+        combine(chars,length);
+        --index;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(new CharConbine().combine("abc".toCharArray()));
+    }
+}
+```
+
+
+
 ## 链表与树
 
 - 链表长度为1的CRUD
@@ -654,7 +811,59 @@ public void PrintReverseList(ListNode head){
 }
 ```
 
+### 面试题7 重建二叉树
 
+```java
+package part1;
+
+import java.util.Arrays;
+
+/**
+ * @Auther: Goffery Gong
+ * @Date: 2019/1/15 09:58
+ * @Description:
+ */
+public class RebuildTree {
+    /**
+     * 重建二叉树
+     * @param preOrder
+     * @param midOrder
+     * @return
+     */
+    BinaryTreeNode reBuildTree(int[] preOrder, int[] midOrder) {
+        if (preOrder == null || midOrder == null)
+            return null;
+        return reBuildTree(preOrder, 0, preOrder.length - 1, midOrder, 0, midOrder.length - 1);
+    }
+
+    private BinaryTreeNode reBuildTree(int[] preOrder, int preStart, int preEnd, int[] midOrder, int midStart, int midEnd) {
+        if (preStart > preEnd || midStart > midEnd)
+            return null;
+        //前序遍历的第一个为根节点，构建根节点
+        BinaryTreeNode root = new BinaryTreeNode(preOrder[preStart]);
+
+
+        //对应到中序遍历，划分左右分支
+        int border = midStart;
+        while (border <= midEnd && midOrder[border] != preOrder[preStart])
+            border++;
+
+        int leftLength = border - midStart;
+        int leftPreEnd = preStart + leftLength;//前序遍历序列左分支长度
+        root.left = reBuildTree(preOrder, preStart + 1, leftPreEnd, midOrder, midStart, border - 1);
+        root.right = reBuildTree(preOrder, leftPreEnd + 1, preEnd, midOrder, border + 1, midEnd);
+        return root;
+    }
+
+    public static void main(String[] args) {
+        int[] a = {1, 2, 4, 7, 3, 5, 6, 8};
+        int[] b = {4, 7, 2, 1, 5, 3, 8, 6};
+        BinaryTreeNode root = new RebuildTree().reBuildTree(a, b);
+        System.out.println(root);
+    }
+
+}
+```
 
 ### 面试题24-反转链表
 
@@ -1557,6 +1766,81 @@ class TreeNode {
 
     public TreeNode(int val) {
         this.val = val;
+    }
+}
+```
+
+### 面试题37- 序列化和反序列化二叉树
+
+```java
+package part1;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @Auther: Goffery Gong
+ * @Date: 2019/1/14 22:07
+ * @Description:
+ */
+public class SerilizeTree {
+
+    List<String> list = new ArrayList<>();
+    int index = -1;
+
+    /**
+     * 序列化二叉树函数
+     * null用%替代
+     *
+     * @param root
+     */
+    List<String> Serilize(BinaryTreeNode root) {
+        if (root == null) {
+            list.add("%");
+            return list;
+        }
+        //前序遍历二叉树
+        list.add(String.valueOf(root.value));
+        Serilize(root.left);
+        Serilize(root.right);
+
+        return list;
+    }
+
+    /**
+     * 反序列化二叉树
+     * @param list
+     * @return
+     */
+    BinaryTreeNode Deserilize(List<String> list) {
+        BinaryTreeNode root = new BinaryTreeNode();
+        return Deserilize(root, list);
+    }
+
+    private BinaryTreeNode Deserilize(BinaryTreeNode root, List<String> list) {
+        index++;
+        if (index >= list.size())
+            return root;
+        String num = list.get(index);
+        if (num != "%") {
+            root = new BinaryTreeNode();
+            root.value = Integer.valueOf(num);
+            root.left = Deserilize(root.left, list);
+            root.right = Deserilize(root.right, list);
+        }
+        return root;
+    }
+
+    public static void main(String[] args) {
+        BinaryTreeNode node = new BinaryTreeNode();
+        node.value = 1;
+        node.add(2, 3);
+        node.left.add(4, 5);
+        node.right.add(6, 7);
+        List<String> list = new SerilizeTree().Serilize(node);
+        System.out.println(list);
+        BinaryTreeNode root = new SerilizeTree().Deserilize(list);
+        System.out.println(root);
     }
 }
 ```
