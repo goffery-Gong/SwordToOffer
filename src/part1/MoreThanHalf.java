@@ -9,28 +9,29 @@ public class MoreThanHalf {
     /**
      * 通过特点：数量超过一半的数字，一定在数组的中间位置
      * O(n)
+     *
      * @param array
      * @return
      */
-    int moreThanHalf(int[] array) {
+    int moreThanHalf(int[] array) throws Exception {
         if (array == null || array.length == 0)
             return 0;
 
         int mid = array.length >> 1;
-        int index = Partition(array, 0, array.length - 1);
+        int index = Utils.Partition(array, 0, array.length - 1);
         int lo = 0;
         int hi = array.length - 1;
         while (index != mid) {
             if (index < mid) {
                 lo = index + 1;
-                index = Partition(array, lo, hi);
+                index = Utils.Partition(array, lo, hi);
             } else {
                 hi = index - 1;
-                index = Partition(array, lo, hi);
+                index = Utils.Partition(array, lo, hi);
             }
         }
         //判断该数字的数量是否大于数组长度的一半
-        int result=array[index];
+        int result = array[index];
         if (isMoreThanHalf(array, result))
             return 0;
         return result;
@@ -43,12 +44,12 @@ public class MoreThanHalf {
      * @param array
      * @return
      */
-    int moreThanHalf2(int[] array){
+    int moreThanHalf2(int[] array) {
         if (array == null || array.length == 0)
             return 0;
 
-        int result=array[0];
-        int times=0;
+        int result = array[0];
+        int times = 0;
         for (int anArray : array) {
             if (times == 0) {
                 result = anArray;
@@ -63,6 +64,7 @@ public class MoreThanHalf {
             return 0;
         return result;
     }
+
     private boolean isMoreThanHalf(int[] array, int result) {
         int times = 0;
         for (int anArray : array)
@@ -71,7 +73,7 @@ public class MoreThanHalf {
         return times * 2 < array.length;
     }
 
-    private int Partition(int[] array, int lo, int hi) {
+    int Partition(int[] array, int lo, int hi) {
         int i = lo;
         int j = hi + 1;
         while (true) {
@@ -96,7 +98,11 @@ public class MoreThanHalf {
     }
 
     public static void main(String[] args) {
-        int[] a = {1, 2, 2, 2, 3};
-        System.out.println(new MoreThanHalf().moreThanHalf2(a));
+        int[] a = {2,4,1,0,3};
+        try {
+            System.out.println(new MoreThanHalf().moreThanHalf(a));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -4,8 +4,10 @@
 
 ## 算法题需要注意的
 
-- 代码完整性：功能测试（特殊值——突破思维限制）；边界测试（循环、递归的终止条件）；负面测试（错误的输入）
-- 特殊值：数值的负数/0；null；
+- 代码完整性：
+  - 功能测试（特殊值——突破思维限制）；
+  - 边界测试（循环、递归的终止条件）；
+  - 特殊值测试（数值的负数/0；null；）
 
 ## 设计模式
 
@@ -581,7 +583,275 @@ public class PrintMatrix {
 }
 ```
 
+### 面试题39 数组中出现此处超过一半的数字
 
+```java
+package part1;
+
+/**
+ * @Auther: Goffery Gong
+ * @Date: 2019/1/16 20:58
+ * @Description:
+ */
+public class MoreThanHalf {
+    /**
+     * 通过特点：数量超过一半的数字，一定在数组的中间位置
+     * O(n)
+     * @param array
+     * @return
+     */
+    int moreThanHalf(int[] array) {
+        if (array == null || array.length == 0)
+            return 0;
+
+        int mid = array.length >> 1;
+        int index = Partition(array, 0, array.length - 1);
+        int lo = 0;
+        int hi = array.length - 1;
+        while (index != mid) {
+            if (index < mid) {
+                lo = index + 1;
+                index = Partition(array, lo, hi);
+            } else {
+                hi = index - 1;
+                index = Partition(array, lo, hi);
+            }
+        }
+        //判断该数字的数量是否大于数组长度的一半
+        int result=array[index];
+        if (isMoreThanHalf(array, result))
+            return 0;
+        return result;
+    }
+
+    /**
+     * 特点：最后一次吧次数times设置为1的数字就是返回值
+     * o(n)
+     *
+     * @param array
+     * @return
+     */
+    int moreThanHalf2(int[] array){
+        if (array == null || array.length == 0)
+            return 0;
+
+        int result=array[0];
+        int times=0;
+        for (int anArray : array) {
+            if (times == 0) {
+                result = anArray;
+                times = 1;
+            } else if (anArray == result)
+                times++;
+            else
+                times--;
+        }
+        //判断该数字的数量是否大于数组长度的一半
+        if (isMoreThanHalf(array, result))
+            return 0;
+        return result;
+    }
+    private boolean isMoreThanHalf(int[] array, int result) {
+        int times = 0;
+        for (int anArray : array)
+            if (anArray == result)
+                times++;
+        return times * 2 < array.length;
+    }
+
+    private int Partition(int[] array, int lo, int hi) {
+        int i = lo;
+        int j = hi + 1;
+        while (true) {
+            while (array[++i] < array[lo])
+                if (i == hi)
+                    break;
+            while (array[lo] < array[--j])
+                if (j == lo)
+                    break;
+            if (i >= j)
+                break;
+            exch(array, i, j);
+        }
+        exch(array, lo, j);
+        return j;
+    }
+
+    private void exch(int[] array, int i, int j) {
+        int temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+
+    public static void main(String[] args) {
+        int[] a = {1, 2, 2, 2, 3};
+        System.out.println(new MoreThanHalf().moreThanHalf2(a));
+    }
+}
+```
+
+### 面试题40 最小k个数
+
+- 研究一下书中的partition函数（`Utils.partition()`）
+
+```java
+package part1;
+
+import java.util.*;
+
+/**
+ * @Auther: Goffery Gong
+ * @Date: 2019/1/16 22:11
+ * @Description:
+ */
+public class LessKNum {
+    /**
+     * 基于快排切分点，O(n)
+     *
+     * @param input
+     * @param k
+     * @return
+     * @throws Exception
+     */
+    ArrayList<Integer> lesskNum(int[] input, int k) throws Exception {
+        ArrayList<Integer> list = new ArrayList<>();
+        if (input == null || input.length == 0 || k <= 0 || k > input.length)
+            return list;
+
+        int lo = 0;
+        int hi = input.length - 1;
+        int index = Utils.Partition(input, lo, hi);
+        while (index != k - 1) {
+            if (index < k - 1) {
+                lo = index + 1;
+                index = Utils.Partition(input, lo, hi);
+            } else {
+                hi = index - 1;
+                index = Utils.Partition(input, lo, hi);
+            }
+        }
+        for (int i = 0; i < k; i++)
+            list.add(input[i]);
+        return list;
+    }
+
+    /**
+     * 最大堆；O(nlogk)；适合处理海量数据
+     * 使用优先队列；最大堆保存这k个数，每次只和堆顶比，如果比堆顶小，删除堆顶，新数入堆。
+     *
+     * @param input
+     * @param k
+     * @return
+     */
+    public ArrayList<Integer> GetLeastNumbers_Solution1(int[] input, int k) {
+        ArrayList<Integer> result = new ArrayList<>();
+        int length = input.length;
+        if (k > length || k == 0) {
+            return result;
+        }
+        PriorityQueue<Integer> maxHeap = new PriorityQueue<>(k, Comparator.reverseOrder());//倒序
+        for (int i = 0; i < length; i++) {
+            if (maxHeap.size() != k) {
+                maxHeap.offer(input[i]);
+            } else if (maxHeap.peek() > input[i]) {
+                Integer temp = maxHeap.poll();
+                temp = null;
+                maxHeap.offer(input[i]);
+            }
+        }
+        result.addAll(maxHeap);
+        return result;
+    }
+
+    /**
+     * 最大堆，自己构建堆树
+     *
+     * @param input
+     * @param k
+     * @return
+     */
+    public ArrayList<Integer> GetLeastNumbers_Solution2(int[] input, int k) {
+        ArrayList<Integer> list = new ArrayList<Integer>();
+        //检查输入的特殊情况
+        if (input == null || input.length <= 0 || input.length < k) {
+            return list;
+        }
+        //构建最大堆
+        for (int len = k / 2 - 1; len >= 0; len--) {
+            adjustMaxHeapSort(input, len, k - 1);
+        }
+        //从第k个元素开始分别与最大堆的最大值做比较，如果比最大值小，则替换并调整堆。
+        //最终堆里的就是最小的K个数。
+        int tmp;
+        for (int i = k; i < input.length; i++) {
+            if (input[i] < input[0]) {
+                tmp = input[0];
+                input[0] = input[i];
+                input[i] = tmp;
+                adjustMaxHeapSort(input, 0, k - 1);
+            }
+        }
+        for (int j = 0; j < k; j++) {
+            list.add(input[j]);
+        }
+        return list;
+    }
+
+    public void adjustMaxHeapSort(int[] input, int pos, int length) {
+        int temp;
+        int child;
+        for (temp = input[pos]; 2 * pos + 1 <= length; pos = child) {
+            child = 2 * pos + 1;
+            if (child < length && input[child] < input[child + 1]) {
+                child++;
+            }
+            if (input[child] > temp) {
+                input[pos] = input[child];
+            } else {
+                break;
+            }
+        }
+        input[pos] = temp;
+    }
+
+    /**
+     * 冒泡排序的思想
+     *
+     * @param input
+     * @param k
+     * @return
+     */
+    public ArrayList<Integer> GetLeastNumbers_Solution(int[] input, int k) {
+        ArrayList<Integer> al = new ArrayList<Integer>();
+        if (k > input.length) {
+            return al;
+        }
+        for (int i = 0; i < k; i++) {
+            for (int j = 0; j < input.length - i - 1; j++) {
+                if (input[j] < input[j + 1]) {
+                    int temp = input[j];
+                    input[j] = input[j + 1];
+                    input[j + 1] = temp;
+                }
+            }
+            al.add(input[input.length - i - 1]);
+        }
+        return al;
+    }
+
+    public static void main(String[] args) {
+        int[] a = {4, 5, 1, 6, 2, 7, 3, 8};
+        List list = null;
+        try {
+            list = new LessKNum().lesskNum(a, 1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println(list);
+
+    }
+}
+```
 
 ## 字符串
 
@@ -807,6 +1077,51 @@ public void PrintReverseList(ListNode head){
         if(head.next!=null)//这里必须要判断，不然会出现最后一个节点NPE
             PrintReverseList(head.next);
         System.out.println(head.value+" ");
+    }
+}
+```
+
+### 面试题18 删除重复链表节点
+
+```java
+package part1;
+
+/**
+ * @Auther: gongzhiwei6
+ * @Date: 2018/12/28 10:11
+ * @Description:
+ */
+public class DeleteRepeatedNode extends MyLinkedList {
+//    class Node<E> {
+//        E value;
+//        Node<E> next;
+//    }
+
+    public void deleteRepeatedNode(MyLinkedList list) throws Exception {
+        if (list==null)
+            throw new Exception("list不能为空");
+
+        Node current = list.firstNode;
+        int index = 1;
+
+        //循环遍历链表
+        while (current.next != null) {
+            if (current.value == current.next.value) {
+                // 循环删除当前重复的节点
+                // 注意当除服数字在链表尾，current.next会为空
+                while (current.next!=null && current.value == current.next.value) {
+                    current = current.next;
+                    list.remove(index);
+                }
+                //尽量不要让current为null
+                if(current.next!=null)
+                    current=current.next;
+                list.remove(index);
+            } else {
+                current = current.next;
+                index++;
+            }
+        }
     }
 }
 ```
