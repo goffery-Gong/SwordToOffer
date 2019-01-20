@@ -10,6 +10,7 @@ import java.util.Random;
  * @Description:
  */
 public class Utils {
+    //复杂度O(N)
     static int Partition(int[] a, int lo, int hi) throws Exception {
         if (a == null || a.length == 0 || hi <= 0 || hi >= a.length)
             throw new Exception("参数有误！");

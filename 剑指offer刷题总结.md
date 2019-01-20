@@ -693,6 +693,7 @@ public class MoreThanHalf {
 ### 面试题40 最小k个数
 
 - 研究一下书中的partition函数（`Utils.partition()`）
+- 最大堆 {o(1)时间获取到k个数字中的最大值，o(nlogk)时间完成插入，删除}；
 
 ```java
 package part1;
@@ -736,7 +737,7 @@ public class LessKNum {
     }
 
     /**
-     * 最大堆；O(nlogk)；适合处理海量数据
+     * 最大堆；O(nlogk) {o(1)时间获取到k个数字中的最大值，o(logk)时间完成插入，删除}；适合处理海量数据
      * 使用优先队列；最大堆保存这k个数，每次只和堆顶比，如果比堆顶小，删除堆顶，新数入堆。
      *
      * @param input
@@ -1794,6 +1795,8 @@ public class PrintBinaryTree {
 ```
 
 ### 面试题33-二叉搜索树的后序遍历序列
+
+- BST的插入：平均时间O(logn)
 
 ```java
 package part1;

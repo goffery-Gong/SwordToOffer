@@ -8,7 +8,7 @@ package part1;
 public class MoreThanHalf {
     /**
      * 通过特点：数量超过一半的数字，一定在数组的中间位置
-     * O(n)
+     * 得到数组中任意k大的数字，O(n)
      *
      * @param array
      * @return
