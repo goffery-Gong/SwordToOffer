@@ -25,6 +25,7 @@ public class NumberofOne {
                 tempNum++;
             i = i / 10;
         }
+
         return tempNum;
     }
 }

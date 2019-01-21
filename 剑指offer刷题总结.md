@@ -200,6 +200,86 @@ public class Power {
 }
 ```
 
+### 面试题44 数字序列中某一位的数字
+
+```java
+package part1;
+
+/**
+ * @Auther: Goffery Gong
+ * @Date: 2019/1/21 09:56
+ * @Description:
+ */
+public class DigitAtIndex {
+    int digitAtIndex(int n) {
+        int temp = 1;//一个数字的位数
+        int num = 0; //数字
+        int tempNum;
+        int result = 0;
+
+        while (temp < n) {
+            tempNum = num;
+            while (num != 0) {
+                temp++;
+                num = num / 10;
+            }
+            num = tempNum;
+            if (temp < n)
+                num++;
+        }
+        //数字位一定在num中
+        return num;
+    }
+
+    /**
+     * 方法2
+     * @param n
+     * @return
+     */
+    int digitAtIndex2(int n) {
+        if (n < 0)
+            return -1;
+        int digit = 1;
+        while (true) {
+            int numbers = countOfInteger(digit);
+            if (n < numbers * digit)
+                return digitAtIndex(n, digit);
+            n -= numbers * digit;
+            digit++;
+        }
+    }
+
+    //digit位的数字数量（如2位数有90个）
+    private int countOfInteger(int digit) {
+        if (digit == 1)
+            return 10;
+        return (int) (Math.pow(10, digit) - Math.pow(10, digit - 1));
+    }
+
+    //结果
+    private int digitAtIndex(int n, int digit) {
+        int num = n / digit + beginNum(digit);
+        int indexFromRight = digit - n % digit;
+        for (int i = 1; i < indexFromRight; i++)
+            num /= 10;
+        return num % 10;
+    }
+
+    private int beginNum(int digit) {
+        if (digit == 1)
+            return 0;
+        return (int) Math.pow(10, digit - 1);
+    }
+
+    public static void main(String[] args) {
+        DigitAtIndex digitAtIndex = new DigitAtIndex();
+        System.out.println(digitAtIndex.countOfInteger(3));
+        System.out.println(digitAtIndex.digitAtIndex(1001));
+        System.out.println(digitAtIndex.digitAtIndex2(15));
+    }
+}
+```
+
 ## 数组
 
 - 数组注意输入：判断null与数组长度为0，a.length==0
@@ -853,6 +933,65 @@ public class LessKNum {
     }
 }
 ```
+
+### 面试题42 最大子序列和问题
+
+```java
+package part1;
+
+/**
+ * @Auther: Goffery Gong
+ * @Date: 2019/1/20 16:37
+ * @Description:
+ */
+public class MaxSubArray {
+    /**
+     * o(n^2)
+     *
+     * @param array
+     * @return
+     */
+    int maxSubArray(int[] array) {
+        if (array == null && array.length == 0)
+            return 0;
+        int tempSum;
+        int maxSum = 0;
+
+        for (int i = 0; i < array.length; i++) {
+            tempSum = 0;
+            for (int j = i; j < array.length; j++) {
+                tempSum += array[j];
+                if (tempSum > maxSum)
+                    maxSum = tempSum;
+            }
+        }
+        return maxSum;
+    }
+
+    int maxSubArray_dp(int[] array) {
+        if (array == null && array.length == 0)
+            return 0;
+
+        int tempSum = array[0];
+        int maxSum = array[0]; //防止为负
+
+        for (int i = 1; i < array.length; i++) {
+            tempSum = (tempSum < 0) ? array[i] : tempSum + array[i];
+            maxSum = (tempSum > maxSum) ? tempSum : maxSum;
+        }
+        /*int tempSum = 0;
+        int maxSum = 0x80000000; //32位数最小值，负2的32次方
+
+        for (int i = 0; i < array.length; i++) {
+            tempSum = (tempSum < 0) ? array[i] : tempSum + array[i];
+            maxSum = (tempSum > maxSum) ? tempSum : maxSum;
+        }*/
+        return maxSum;
+    }
+}
+```
+
+### 面试题45-把数组排成最小的数
 
 ## 字符串
 
@@ -2159,6 +2298,55 @@ public class SerilizeTree {
         System.out.println(list);
         BinaryTreeNode root = new SerilizeTree().Deserilize(list);
         System.out.println(root);
+    }
+}
+```
+
+### 面试题41-数据流中的中位数
+
+```java
+package part1;
+
+import java.util.Comparator;
+import java.util.PriorityQueue;
+
+/**
+ * @Auther: Goffery Gong
+ * @Date: 2019/1/20 15:49
+ * @Description: 通过最大堆，最小堆实现找到数据流的中位数
+ */
+public class MidNumInFlow {
+    private PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+    private PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Comparator.reverseOrder());
+    private int count;
+
+    public void Insert(Integer num) {
+        //count为奇数，进入最大堆，count变为偶数
+        if ((count & 1) == 1) {
+            minHeap.offer(num);
+            int filterMinNum = minHeap.poll();
+            maxHeap.offer(filterMinNum);
+        } else {//count为偶数，进入最小堆，count变为奇数
+            maxHeap.offer(num);
+            int filterMaxNum = maxHeap.poll();
+            minHeap.offer(filterMaxNum);
+        }
+        count++;
+    }
+
+    Double GetMedian() {
+        if ((count & 1) == 0)
+            return (double) ((minHeap.peek() + maxHeap.peek())) / 2;
+        else
+            return (double) (minHeap.peek());
+    }
+
+    public static void main(String[] args) {
+        MidNumInFlow midNumInFlow = new MidNumInFlow();
+        midNumInFlow.Insert(5);
+        System.out.println(midNumInFlow.GetMedian());
+        midNumInFlow.Insert(2);
+        System.out.println(midNumInFlow.GetMedian());
     }
 }
 ```

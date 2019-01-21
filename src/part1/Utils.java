@@ -10,6 +10,8 @@ import java.util.Random;
  * @Description:
  */
 public class Utils {
+
+
     //复杂度O(N)
     static int Partition(int[] a, int lo, int hi) throws Exception {
         if (a == null || a.length == 0 || hi <= 0 || hi >= a.length)
@@ -89,18 +91,27 @@ public class Utils {
         Arrays.sort(a, new Comparator<Integer>() {
             @Override
             public int compare(Integer o1, Integer o2) {
-                return o2-o1;
+                return o2 - o1;
             }
         });
 
         //倒序3
-        Arrays.sort(a, (o1, o2) -> o2-o1);
+        Arrays.sort(a, (o1, o2) -> o2 - o1);
         //倒序4
-        Arrays.sort(a, (o1, o2) ->o2.compareTo(o1));
+        Arrays.sort(a, (o1, o2) -> o2.compareTo(o1));
         //倒序5
         Arrays.sort(a, Comparator.reverseOrder());
 
         for (int i : a)
             System.out.print(i + " ");
+    }
+
+    /**
+     * 判断输入数组是否为空或者长度为0
+     * @param array
+     * @return
+     */
+    public static boolean isNullorZero(int[] array) {
+        return array==null|| array.length==0 ;
     }
 }
