@@ -14,7 +14,6 @@ public class RobotTraceInMatrix {
         if (bound < 0 || rows <= 0 || cols <= 0) return 0;
         boolean[] isVisited = new boolean[rows * cols];
 
-
         int size = countNum(bound, rows, cols, 0, 0, isVisited);
         return size;
     }

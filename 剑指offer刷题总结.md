@@ -280,6 +280,10 @@ public class DigitAtIndex {
 }
 ```
 
+
+
+
+
 ## 数组
 
 - 数组注意输入：判断null与数组长度为0，a.length==0
@@ -403,7 +407,60 @@ public class FindDoubleNum {
 
 ### 矩阵中路径（回溯法）
 
+```java
+package part1;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+/**
+ * 矩阵中寻找字符串
+ */
+public class FindStringInMatrix {
+    public static boolean hasPath(char[] matrix, int rows, int cols, char[] str) {
+        if (matrix == null) return false;
+
+        boolean[] isVisited = new boolean[rows * cols];
+        //寻找第一个符合条件的字符作为入口
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if ( hasPathElement(matrix, rows, cols, str, i, j, 0, isVisited))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean hasPathElement(char[] matrix, int rows, int cols, char[] str,
+                                          int i, int j, int strIndex, boolean[] isVisited) {
+        int index = i * cols + j; //二维数组元素下标，转化为一维数组的下标
+        if (i < 0 || i >=rows || j < 0 || j >= cols || matrix[index] != str[strIndex] || isVisited[index])
+            return false;
+        if(strIndex==str.length-1)
+            return true;
+
+        isVisited[index]=true;//先将访问的矩阵元素状态置为“true”
+        if(hasPathElement(matrix, rows, cols, str, i-1, j, strIndex+1, isVisited)
+                ||hasPathElement(matrix, rows, cols, str, i+1, j, strIndex+1, isVisited)
+                ||hasPathElement(matrix, rows, cols, str, i, j-1, strIndex+1, isVisited)
+                ||hasPathElement(matrix, rows, cols, str, i, j+1, strIndex+1, isVisited))
+            return true;
+
+        //如果没找到合适的，则将此时访问的矩阵元素状态恢复为“false”
+        isVisited[index]=false;
+        return false;
+    }
+
+    public static void main(String[] args) {
+        char[] chars="ABCB".toCharArray();
+        char[] matrix="ABCESFCSADEE".toCharArray();
+        System.out.println(hasPath(matrix,3,4,chars));
+
+    }
+}
+```
 
 ### 机器人运动范围（回溯法）
 
@@ -507,6 +564,7 @@ public class MaxValueAfterCutting {
         tempLengths[3]=3;
 
         for (int i = 4; i <= n; i++) {
+            maxLength=0;
             for (int j = 1; j <= i/2; j++) {
                 int tempLength=tempLengths[j]*tempLengths[i-j];
                 if(maxLength<tempLength)
@@ -539,6 +597,218 @@ public class MaxValueAfterCutting {
     }
     public static void main(String[] args) {
         System.out.println(maxValueAferCutting2(8));
+    }
+}
+```
+
+### 面试题46- 把数字翻译成字符串（动态规划）
+
+```java
+package part1;
+
+/**
+ * @Auther: Goffery Gong
+ * @Date: 2019/1/24 10:00
+ * @Description: https://www.jianshu.com/p/80e1841909b7
+ */
+public class GetTranslationCount {
+    static int getTranslationCount(int number) {
+        if (number < 0)
+            return 0;
+        if (number == 1)
+            return 1;
+
+        return getTanslationCount(Integer.toString(number));
+    }
+
+    private static int getTanslationCount(String number) {
+        int f1 = 0;
+        int f2 = 1;
+        int g;
+        int temp;
+        //动态规划，从右到左计算。
+        //  f(r-2) = f(r-1)+g(r-2,r-1)*f(r);
+        //  如果r-2，r-1能够翻译成字符，则g(r-2,r-1)=1，否则为0
+        for (int i = number.length() - 2; i >= 0; i--) {
+            int num = Integer.parseInt(number.charAt(i) + "" + number.charAt(i + 1));
+            if (num < 26 && num >= 10)
+                g = 1;
+            else
+                g = 0;
+
+            temp = f2;
+            f2 = f2 + g * f1;
+            f1 = temp;
+        }
+        return f2;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(getTranslationCount(-10));  //0
+        System.out.println(getTranslationCount(1234));  //3
+        System.out.println(getTranslationCount(12258)); //5
+    }
+}
+```
+
+![offer9](http://blog.xbblfz.site/img/offer9.png)
+
+### 面试题47-礼物的最大价值（动态规划）
+
+```java
+package part1;
+
+/**
+ * @Auther: Goffery Gong
+ * @Date: 2019/1/24 19:30
+ * @Description:
+ */
+public class GetMaxValue {
+    /**
+     * 常规递归方法
+     * @param values
+     * @param rows
+     * @param cols
+     * @return
+     */
+    int getMaxValue(int[] values, int rows, int cols) {
+        if (values == null || rows<=0 ||cols<=0)
+            return 0;
+        return getMaxValue(values, rows, cols, 0, 0,0);
+    }
+
+    private int getMaxValue(int[] values, int rows, int cols, int i, int j,int count) {
+        int index = i * cols + j;
+        if (i < 0 || i >= rows || j < 0 || j >= cols )
+            return count;
+
+        //f(i,j)=max{f(i+1,j),f(i,j+1)}+gift(i,j)
+        int value1=getMaxValue(values, rows, cols, i + 1, j, count);
+        int value2=getMaxValue(values, rows, cols, i, j + 1, count);
+        count = values[index] + Math.max(value1,value2);
+
+        return count;
+    }
+
+    /**
+     * 动态规划1
+     f(i,j)=max{f(i-1,j),f(i,j-1)}+gift(i,j)
+     * @param values
+     * @param rows
+     * @param cols
+     * @return
+     */
+    int getMaxValueDG(int[] values,int rows, int cols){
+        if (values == null || rows<=0 ||cols<=0)
+            return 0;
+
+        int[][] maxValues=new int[rows][cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                int left=0;
+                int up=0;
+                if(i>0)
+                    left=maxValues[i-1][j];
+                if(j>0)
+                    up=maxValues[i][j-1];
+
+                //maxValues[i][j]元素表示到达坐标为（i,j）的格子时，value最大值
+                maxValues[i][j]=Math.max(left,up)+values[i*cols+j];
+            }
+        }
+        return maxValues[rows-1][cols-1];
+    }
+
+    /**
+     * 优化
+     * 直接使用一维数组保存，长度为列数n。当计算dp[i][j]时，
+     * 数组前j个数字分别是dp[i][0], dp[i][1],...,dp[i][j-1],
+     * 数组从下标为j的数字开始到最后一个数字分别是dp[i-1][j],
+     * dp[i-1][j+1],...,dp[i-1][n-1]。
+     */
+    int getMaxValueDG2(int[] values,int rows, int cols){
+        if (values == null || rows<=0 ||cols<=0)
+            return 0;
+
+        int[] maxValues=new int[cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                int left=0;
+                int up=0;
+                if(i>0)
+                    left=maxValues[j];
+                if(j>0)
+                    up=maxValues[j-1];
+
+                //maxValues[i][j]元素表示到达坐标为（i,j）的格子时，value最大值
+                maxValues[j]=Math.max(left,up)+values[i*cols+j];
+            }
+        }
+        return maxValues[cols-1];
+    }
+    public static void main(String[] args) {
+        int[] values = {1, 10, 3, 8, 12, 2, 9, 6, 5, 7, 4, 11, 3, 7, 16, 5};
+        System.out.println(new GetMaxValue().getMaxValueDG(values, 4, 4));
+    }
+}
+
+```
+
+### 面试题48 最长不含重复字符的子字符串
+
+$$
+f(i):第i个字符为结尾的不包含重复字符的字符串最长长度\\
+\begin{cases}  
+
+             第i个字符之前没出现过:f(i)=f(i-1)+1 ，往后添加1 \\
+             第i个字符之前出现过：
+             \begin{cases}
+             	d(第i个字符和之前出现的位置的距离)<=f(i-1)：f(i)=d \\
+             	d(第i个字符和之前出现的位置的距离)>f(i-1): f(i)=f(i-1)+1 
+             \end{cases}
+            
+\end{cases}
+$$
+
+```java
+package part1;
+
+/**
+ * @Auther: Goffery Gong
+ * @Date: 2019/1/24 22:06
+ * @Description:
+ */
+public class LongestSubstringWithOutDup {
+    //
+    int longestSubstringWithOutDup(String str) {
+        if (str == null)
+            return 0;
+
+        int tempLength = 0;
+        int maxLength = 0;
+        int[] position = new int[26];
+        for (int i = 0; i < position.length; i++)
+            position[i] = -1;
+
+        for (int i = 0; i < str.length(); i++) {
+            int preAppearIndext = position[str.charAt(i) - 'a'];
+            int d = i - preAppearIndext;
+            if (preAppearIndext < 0 || d > tempLength)//情况1,3
+                tempLength++;
+            else
+                tempLength=d;  //情况2
+
+            if(tempLength>maxLength)
+                maxLength=tempLength;
+            position[str.charAt(i) - 'a']=i; //记录字符出现位置为i
+        }
+//        if(tempLength>maxLength)
+//            maxLength=tempLength; ????这里为何要做判断
+        return maxLength;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(new LongestSubstringWithOutDup().longestSubstringWithOutDup("arabcacf"));
     }
 }
 ```
@@ -936,6 +1206,17 @@ public class LessKNum {
 
 ### 面试题42 最大子序列和问题
 
+动态规划：
+$$
+f(i)=\begin{cases}  
+\left\{  
+             pData[i] \\
+             f(i-1)+ pData[i] 
+\right.  
+\end{cases}
+$$
+
+
 ```java
 package part1;
 
@@ -992,6 +1273,145 @@ public class MaxSubArray {
 ```
 
 ### 面试题45-把数组排成最小的数
+
+```java
+package part1;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * @Auther: Goffery Gong
+ * @Date: 2019/1/21 15:56
+ * @Description:
+ */
+public class PrintMinNumber {
+    List<String> list = new ArrayList<>();
+
+    /**
+     * 常规方法，全排列然后找最小
+     *
+     * @param numbers
+     * @return
+     */
+    String printMinNumber(int[] numbers) {
+        if (Utils.isNullorZero(numbers))
+            return null;
+        allNum(numbers, 0);
+        return leastInList(list);
+    }
+
+    //找出全排列list中的最小数字
+    private String leastInList(List<String> list) {
+        long leastNum = Long.valueOf(list.get(0));//可能会超出大小
+        long num;
+        for (String str : list) {
+            num = Long.valueOf(str);
+            if (num < leastNum)
+                leastNum = num;
+        }
+        return String.valueOf(leastNum);
+    }
+
+    //数组中元素的全排列
+    private void allNum(int[] array, int i) {
+        if (i >= array.length)
+            return;
+
+        for (int j = i; j < array.length; j++) {
+            if (!list.contains(toString(array)))
+                list.add(toString(array));
+            int[] newArray = exchAndBuild(array, i, j);
+            allNum(newArray, i + 1);
+        }
+    }
+
+    private String toString(int[] array) {
+        StringBuilder sb = new StringBuilder();
+        for (int i : array) {
+            sb.append(i);
+        }
+        return sb.toString();
+    }
+
+    private int[] exchAndBuild(int[] array, int i, int j) {
+        int temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+        return Arrays.copyOf(array, array.length);
+    }
+
+
+    /**
+     * 自定义排序大小
+     * 定义一个比较大小的函数，比较两个字符串s1, s2大小的时候，先将它们拼接起来，比较s1+s2,和s2+s1那个大，
+     * 如果s1+s2大，那说明s2应该放前面，所以按这个规则，s2就应该排在s1前面
+     * 比如 "3" < "31"但是 "331" > "313"，所以要将二者拼接起来进行比较
+     * @param
+     */
+    String printMinNumber2(int[] numbers) {
+        String str = "";
+        if (Utils.isNullorZero(numbers)) {
+            return str;
+        }
+
+        for (int i = 0; i < numbers.length; i++) {
+            for (int j = i + 1; j < numbers.length; j++) {
+                long a = Long.valueOf(numbers[i] + "" + numbers[j]);
+                long b = Long.valueOf(numbers[j] + "" + numbers[i]);
+                if (a > b) {
+                    int temp = numbers[i];
+                    numbers[i] = numbers[j];
+                    numbers[j] = temp;
+                }
+            }
+        }
+        for (int j = 0; j < numbers.length; j++)
+            str += String.valueOf(numbers[j]);
+
+        return str;
+    }
+
+    /**
+     * 自定义排序2，通过使用string来避免大数问题
+     * @param numbers
+     * @return
+     */
+    String printMinNumber3(int[] numbers){
+        StringBuilder sb=new StringBuilder();
+         if (Utils.isNullorZero(numbers)) {
+            return sb.toString();
+        }
+
+        int length=numbers.length;
+        String[] strs=new String[length];
+        //转为字符串数组
+        for (int i = 0; i < length; i++)
+            strs[i]=String.valueOf(numbers[i]);
+
+        //将strs数组按照定义的comparator从小到大排序
+        Arrays.sort(strs,(String s1,String s2)->{
+            String c1=s1+s2;
+            String c2=s2+s1;
+            return c1.compareTo(c2);
+        });
+
+        for (int i = 0; i < length; i++)
+            sb.append(strs[i]);
+
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        int[] a = {3334, 3, 3333332};
+        int[] b = {3, 2, 1};
+        String list = new PrintMinNumber().printMinNumber3(b);
+        System.out.println(list);
+//        System.out.println(Integer.valueOf(b[0]+""+b[1]));
+    }
+}
+```
 
 ## 字符串
 
@@ -2542,7 +2962,8 @@ Fibonacci(4) = Fibonacci(3) + Fibonacci(2);
 
   运用了两个公式：
 
-  $\left[
+  $$
+  \left[
   \begin{matrix}
   f(n)& f(n-1) \\
   f(n-1) & f(n-2) 
@@ -2552,7 +2973,9 @@ Fibonacci(4) = Fibonacci(3) + Fibonacci(2);
   1& 1 \\
   1 & 0 
   \end{matrix}
-  \right]^{n-1}$所以求得左上角第一个就行
+  \right]^{n-1}
+  $$
+  所以求得左上角第一个就行
 
   $ a^n=a^{n/2}*a^{n/2} $ 当n为偶数；
 
