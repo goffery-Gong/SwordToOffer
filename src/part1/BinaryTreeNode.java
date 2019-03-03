@@ -2,8 +2,8 @@ package part1;
 
 public class BinaryTreeNode {
     int value;
-    BinaryTreeNode left;
-    BinaryTreeNode right;
+    public BinaryTreeNode left;
+    public BinaryTreeNode right;
 
     public BinaryTreeNode() {
 

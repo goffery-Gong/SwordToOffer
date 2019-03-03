@@ -57,6 +57,8 @@ public class CircleList {
         }
         return null;
     }
+
+
      public static void main(String[] args) {
         MyLinkedList<Integer> list = new MyLinkedList<>();
         list.addFirst(3);

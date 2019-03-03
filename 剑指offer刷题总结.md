@@ -11,7 +11,7 @@
 
 ## 设计模式
 
-### 单例模式
+### 面试题2-单例模式
 
 - 关键点：自由序列化，线程安全，保证单例
 - [参考1](http://wuchong.me/blog/2014/08/28/how-to-correctly-write-singleton-pattern/ )
@@ -28,7 +28,10 @@
 public class EagerSingleton {
     //通过静态变量初始化类实例
     private static final EagerSingleton instance=new EagerSingleton();
-
+	
+    /**
+	 * 私有的默认构造子
+	 */
     private EagerSingleton(){}
 
     //获取唯一实例的静态工厂方法
@@ -132,7 +135,7 @@ public class Singleton {
 
 ```java
 enum SingletonDemo{
-    INSTANCE;
+    INSTANCE
     public void otherMethods(){
         System.out.println("Something");
     }
@@ -280,7 +283,79 @@ public class DigitAtIndex {
 }
 ```
 
+### 面试题49 丑数
 
+```java
+package part1;
+
+/**
+ * @Auther: Goffery Gong
+ * @Date: 2019/2/17 19:51
+ * @Description:
+ */
+public class IsUgly {
+    boolean isUgly(int number) {
+        while (number % 2 == 0)
+            number /= 2;
+        while (number % 3 == 0)
+            number /= 3;
+        while (number % 5 == 0)
+            number /= 5;
+
+        return number == 1;
+    }
+
+    //方法1，遍历
+    int getUglyNumber1(int index) {
+        if (index <= 0)
+            return 0;
+
+        int number = 0;
+        int uglyFound = 0;
+        while (uglyFound < index) {
+            number++;
+            if (isUgly(number))
+                uglyFound++;
+        }
+        return number;
+    }
+
+    //方法2，空间换时间
+    int getUglyNumber2(int index) {
+        if (index <=0)
+            return 0;
+
+        int[] uglyNumbers = new int[index];
+        uglyNumbers[0] = 1;
+        int t2 = 0;
+        int t3 = 0;
+        int t5 = 0;
+
+        int nextIndex = 1;
+
+        while (nextIndex < index) {
+            uglyNumbers[nextIndex] = Min(uglyNumbers[t2] * 2, uglyNumbers[t3] * 3, uglyNumbers[t5] * 5);
+            while (uglyNumbers[t2] * 2 <= uglyNumbers[nextIndex])
+                t2++;
+            while (uglyNumbers[t3] * 3 <= uglyNumbers[nextIndex])
+                t3++;
+            while (uglyNumbers[t5] * 5 <= uglyNumbers[nextIndex])
+                t5++;
+            nextIndex++;
+        }
+        return uglyNumbers[nextIndex-1];
+    }
+
+    private int Min(int num1, int num2, int num3) {
+        int min=(num1<num2)?num1:num2;
+        return (min<num3)?min:num3;
+    }
+
+    public static void main(String[] args) {
+        System.out.println( new IsUgly().getUglyNumber2(10));
+    }
+}
+```
 
 
 
@@ -288,7 +363,37 @@ public class DigitAtIndex {
 
 - 数组注意输入：判断null与数组长度为0，a.length==0
 
-###  数组中重复数字
+### 面试题4 二维数组中的查找
+
+```java
+package part1;
+
+/**
+ * @Auther: Goffery Gong
+ * @Date: 2019/2/19 10:34
+ * @Description:
+ */
+public class FindInMatrix {
+    static boolean findInArray(int[][] array, int target) {
+        if (array == null || array.length == 0)
+            return false;
+
+        int row = 0;
+        int col = array[0].length - 1;
+        while (row < array.length && col >= 0) {
+            if (array[row][col] == target)
+                return true;
+            else if (target < array[row][col])
+                col--;
+            else
+                row++;
+        }
+        return false;
+    }
+}
+```
+
+###  面试题3 - 数组中重复数字
 
 ```java
 package part1;
@@ -1413,6 +1518,143 @@ public class PrintMinNumber {
 }
 ```
 
+### 面试题51数组中的逆序对
+
+```java
+package part1;
+
+/**
+ * @Auther: Goffery Gong
+ * @Date: 2019/3/1 15:00
+ * @Description:
+ */
+public class InversePairs {
+    /**
+     * 数组中的逆序对
+     * @param array
+     * @return
+     */
+    public int inversePairs(int[] array) {
+        if (array == null)
+            return 0;
+
+        int[] copy = new int[array.length];
+        for (int i = 0; i < array.length; i++) {
+            copy[i]=array[i];
+        }
+        return inversePairsCore(array, copy, 0, array.length - 1);
+
+    }
+
+    /**
+     *
+     * @param array
+     * @param copy 辅助数组
+     * @param lo
+     * @param hi
+     * @return 测试用例输出结果比较大，对每次返回的count mod(1000000007)求余
+     */
+    private int inversePairsCore(int[] array, int[] copy, int lo, int hi) {
+        if (lo == hi)
+            return 0;
+
+        int mid = (lo + hi) >>> 1;
+        int leftCount=inversePairsCore(copy,array,lo,mid)%1000000007;
+        int rightCount=inversePairsCore(copy,array,mid+1,hi)%1000000007;
+
+        int i = mid;
+        int j = hi;
+        int copyIndex = hi; //辅助数组的index
+        int count = 0;
+        while (i >= lo && j >= mid+1) {
+            if (array[i] > array[j]) {
+                count += j - mid;
+                copy[copyIndex--] = array[i--];
+                //防止count太大而越界
+                if(count>=1000000007)
+                    count%=1000000007;
+            } else
+                copy[copyIndex--] = array[j--];
+        }
+
+        //上面循环是while(i >= low && j > mid) {} 当有一个指针不满足条件时剩余的数字直接进行拷贝到拷贝数组当中，
+        // 因此用了两个for循环 如果满足条件就直接把剩余比它小的数直接进行拷贝
+        for (; i >= lo; i--)
+            copy[copyIndex--] = array[i];
+        for (; j >= mid+1; j--)
+            copy[copyIndex--] = array[j];
+
+        return (leftCount+rightCount+count)%1000000007;
+    }
+
+    public static void main(String[] args) {
+        int[] a={7,5,6,4};
+        System.out.println(new InversePairs().inversePairs(a));
+    }
+}
+```
+
+### 面试题53 在排序数组中查找数字
+
+```java
+package part1;
+
+/**
+ * @Auther: Goffery Gong
+ * @Date: 2019/3/3 20:17
+ * @Description:
+ */
+public class FindNumInSortedArray {
+    public int GetNumberOfK(int [] array , int k) {
+       //通过找到第一次k出现的位置和最后一次出现的位置，得到出现的次数
+        if(array==null || array.length==0)
+            return 0;
+        int first=GetFirst(array, k,0,array.length-1);
+        int end=GetLast(array, k,0,array.length-1);
+        if(first>-1 && end>-1)
+            return end-first+1;
+        return 0;
+    }
+
+    private int GetFirst(int[] array, int k, int lo, int hi){
+        if(lo>hi)   //这里为小于号，保证在等号的时候不会返回-1，而是继续执行逻辑
+            return -1;
+        int mid=(lo+hi)>>1;
+        if(array[mid]>k)
+            return GetFirst(array, k, lo, mid-1);
+        else if(array[mid]<k)
+            return GetFirst(array, k, mid+1, hi);
+        else if(mid-1>=0 && array[mid-1]==k)
+            return GetFirst(array, k, lo,mid-1);
+        else
+            return mid;
+    }
+
+    private int GetLast(int[] array, int k, int lo, int hi){
+        int mid;
+        while(lo<=hi){
+            mid=(lo+hi)>>1;
+            if(array[mid]>k)
+                hi=mid-1;
+            else if(array[mid]<k)
+                lo=mid+1;
+            else if(mid+1<array.length && array[mid+1]==k)
+                lo=mid+1;
+            else
+                return mid;
+        }
+        return -1;
+    }
+
+    public static void main(String[] args) {
+        int[] a={1,2,3,3,3,3};
+        System.out.println(new FindNumInSortedArray().GetNumberOfK(a,3));
+    }
+}
+```
+
+
+
 ## 字符串
 
 ### 面试题20-表示数值的字符串
@@ -1621,6 +1863,105 @@ public class CharConbine {
 }
 ```
 
+### 面试题50第一个只出现一次的字符
+
+```java
+package part1;
+
+import java.util.HashMap;
+
+/**
+ * @Auther: Goffery Gong
+ * @Date: 2019/2/17 21:22
+ * @Description:
+ */
+public class FirstChar {
+    //时间效率：O(n),空间效率O(1)
+    char firstChar(String str) {
+        if (str == null)
+            return '\0';
+        HashMap<Character, Integer> map = new HashMap<>();
+        for (int i = 0; i < str.length(); i++) {
+            char chr = str.charAt(i);
+            if (!map.containsKey(chr))
+                map.put(chr, 1);
+            else {
+                int value = map.get(chr);
+                map.put(chr, value + 1);
+            }
+        }
+
+        for (int i = 0; i < str.length(); i++) {
+            if(map.get(str.charAt(i))==1)
+                return str.charAt(i);
+        }
+        return '\0';
+    }
+
+    //去掉重复的字符
+    String isMoreThanOne(String str){
+        HashMap<Character, Boolean> map=new HashMap<>();
+        for (int i = 0; i < str.length(); i++) {
+            char chr = str.charAt(i);
+            if (!map.containsKey(chr))
+                map.put(chr, false);
+            else {
+                map.put(chr, true);
+            }
+        }
+
+        StringBuilder sb=new StringBuilder();
+        for (int i = 0; i < str.length(); i++) {
+            if(!map.get(str.charAt(i)))
+                sb.append(str.charAt(i));
+        }
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(new FirstChar().firstChar("nanfsfds"));
+        System.out.println(new FirstChar().isMoreThanOne("googlee"));
+    }
+}
+```
+
+### 拓展：字符流中第一个只出现一次的字符
+
+```java
+public class Solution {
+    //Insert one char from stringstream
+    private int index;
+    private int[] map=new int[256];//将chr字符的ascll码作为key，下标值index作为value
+    
+    public Solution(){
+        for(int i=0; i<256; i++)
+            map[i]=-1;
+    }
+    
+    public void Insert(char ch)
+    {
+        if(map[ch]==-1)
+            map[ch]=index;
+        else if(map[ch]>=0)
+            map[ch]=-2;
+        index++;
+    }
+  //return the first appearence once char in current stringstream
+    public char FirstAppearingOnce()
+    {
+        int min=Integer.MAX_VALUE;
+        char c='#';
+        for(int i=0; i<256; i++){
+            if(map[i]>=0 && map[i]<min){
+                c=(char)i;
+                min=map[i];
+            }
+        }
+         return c;
+    }
+}
+```
+
 
 
 ## 链表与树
@@ -1629,7 +1970,7 @@ public class CharConbine {
 - 删除/增加位置为第一个或最后一个
 - 
 
-### 反向输出链表
+### 面试题6 反向输出链表
 
 ```java
 public void PrintReverseList(ListNode head){
@@ -1716,7 +2057,6 @@ public class RebuildTree {
             return null;
         //前序遍历的第一个为根节点，构建根节点
         BinaryTreeNode root = new BinaryTreeNode(preOrder[preStart]);
-
 
         //对应到中序遍历，划分左右分支
         int border = midStart;
@@ -1884,6 +2224,26 @@ public class FindKthNode {
         System.out.println(behind.value);
     }
 
+    //demo2
+    public ListNode FindListNode(ListNode head,int k){
+        if(head==null || k <= 0)
+            return null;
+
+        ListNode p1=head;
+        ListNode p2=head;
+        for (int i = 0; i < k-1; i++) 
+            if(p2.next!=null)
+                p2=p2.next;
+            else
+                return null;
+        
+        while (p2.next!=null) {
+            p2=p2.next;
+            p1=p1.next;
+        }
+        return p1;
+    }
+    
     public static void main(String[] args) {
         MyLinkedList<Integer> list = new MyLinkedList<>();
         list.addFirst(3);
@@ -1946,7 +2306,9 @@ public class CircleList {
         if(head==null)
             return null;
 
-        MyLinkedList.Node slow=head;
+        MyLinkedList.Node slow=head.next;
+        if(slow==null)
+            return null;
         MyLinkedList.Node fast=slow.next;
 
         while(fast!=null && slow!=null){
@@ -2770,6 +3132,66 @@ public class MidNumInFlow {
     }
 }
 ```
+
+### 面试题52 两个链表的第一个公共节点
+
+- 当两个链表有公共节点时，从第一个公共节点开始，之后他们所有的节点都是重合的，不可能再出现分叉；
+- 思路1：将两个链表分别放入栈；然后出栈进行对比，找到最后一个相同的节点；
+- 思路2：分别求出两个链表的长度；设长度差为m；则快的先走m，然后一起走，直到找到第一个相同的节点；
+- 注意：节点相同，即：node1==node2
+
+```java
+/*
+public class ListNode {
+    int val;
+    ListNode next = null;
+
+    ListNode(int val) {
+        this.val = val;
+    }
+}*/
+public class Solution {
+    public ListNode FindFirstCommonNode(ListNode pHead1, ListNode pHead2) {
+        //得到两个链表的长度
+        int n=lengthOfList(pHead1);
+        int m=lengthOfList(pHead2);
+        //长度长的先走，然后短的再一起走，最后找到相同的一个节点
+        ListNode longHead;
+        ListNode shortHead;
+        int lengthDif;
+        if(m-n>0){
+            longHead=pHead2;
+            shortHead=pHead1;
+            lengthDif=m-n;
+        }else{
+            longHead=pHead1;
+            shortHead=pHead2;
+            lengthDif=n-m;
+        }
+        for(int i=0; i<lengthDif;i++)
+            longHead=longHead.next;
+        
+        while(longHead!=null && shortHead!=null ){
+            if(longHead==shortHead)
+                return longHead;
+            longHead=longHead.next;
+            shortHead=shortHead.next;
+        }
+        return null;
+    }
+    
+    private int lengthOfList(ListNode pHead){
+        int n=0;
+        while(pHead!=null){
+            n++;
+            pHead=pHead.next;
+        }
+        return n;
+    }
+}
+```
+
+
 
 ## 栈和队列
 

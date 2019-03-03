@@ -29,7 +29,7 @@ public class MaxSubArray {
         return maxSum;
     }
 
-    int maxSubArray_dp(int[] array) {
+    public int maxSubArray_dp(int[] array) {
         if (array == null && array.length == 0)
             return 0;
 
