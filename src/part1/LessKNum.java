@@ -146,7 +146,7 @@ public class LessKNum {
         int[] a = {4, 5, 1, 6, 2, 7, 3, 8};
         List list = null;
         try {
-            list = new LessKNum().lesskNum(a, 1);
+            list = new LessKNum().lesskNum(a, 8);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -64,10 +64,28 @@ public class IsPopOrder {
         }
         return stack.empty();
     }
+    public boolean IsPopOrder2(int [] pushA,int [] popA) {
+        Stack<Integer> stack=new Stack<>();
+        int j=0;
+        int i;
+      for(i=0;i<popA.length;i++){
+          while(stack.isEmpty() ||(j<pushA.length && stack.peek()!=popA[i])){
+              stack.push(pushA[j]);
+              j++;
+          }
+          if(j>=pushA.length && stack.peek()!=popA[i])
+              break;
+          stack.pop();
+      }
+
+       if(i==popA.length)
+           return true;
+        return false;
+    }
 
     public static void main(String[] args) {
         int[] a={1,2,3,4,5};
         int[] b={4,5,3,2,1};
-        System.out.println(new IsPopOrder().isPopOrder2(a,b));
+        System.out.println(new IsPopOrder().IsPopOrder2(a,b));
     }
 }

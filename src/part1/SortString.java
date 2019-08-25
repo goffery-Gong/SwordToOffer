@@ -32,11 +32,15 @@ public class SortString {
             if (!list.contains(str))
                 list.add(str);
 
-            //交换，构造新的串
+            /*//交换，构造新的串
+
             String newStr = exchAndBuild(str, i, j);
 
             //新的串进行递归
-            sortString(newStr, i + 1);
+            sortString(newStr, i + 1);*/
+
+            if (i != j)
+                sortString(exchAndBuild(str, i, j), i + 1);
         }
     }
 
@@ -50,6 +54,7 @@ public class SortString {
 
     /**
      * 回溯法
+     *
      * @param str
      * @return
      */

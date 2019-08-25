@@ -18,7 +18,7 @@ public class Utils {
             throw new Exception("参数有误！");
 
         //找到一个位置，然后将此位置的数换到最后
-        int index = RandomInRange(lo, hi);
+        int index = RandomInRange(lo, hi);//保持随机性，避免最坏情况
         exch(a, index, hi);
 
         //small是指向比最后一个数小的位置，每找到一个小的就往后移动一位
@@ -27,7 +27,7 @@ public class Utils {
         for (index = lo; index < hi; index++) {
             if (a[index] < a[hi]) {
                 ++small;
-                if (small != index)
+                if (small != index)//比如：13452,2为切分点；则此时small==index=0；不用交换，就是1
                     exch(a, index, small);
             }
         }
