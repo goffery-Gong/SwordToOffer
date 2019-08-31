@@ -22,7 +22,9 @@ public class Singleton {
         return instance;
     }
 
-    //静态内部类。jvm规定，在主动引用类中的静态字段时，要对类进行初始化（延迟初始化）。
+    /**
+     * 静态内部类。jvm规定，在主动引用类中的静态字段时，要对类进行初始化（延迟初始化）。
+     */
     private static class InstanceHolder{
         private static final Singleton INSTANCE=new Singleton();
     }
